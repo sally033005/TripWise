@@ -31,3 +31,21 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker & Environment
+.env
+docker-compose.override.yml
+
+# Frontend
+node_modules/
+dist/
+.next/
+out/
+build/
+
+# Local database data
+postgres-data/
