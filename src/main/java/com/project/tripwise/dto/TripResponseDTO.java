@@ -30,6 +30,8 @@ public class TripResponseDTO {
 
     private Map<String, List<ItineraryItemDTO>> dailyItinerary;
 
+    private List<ReservationDTO> reservations;
+
     public TripResponseDTO(Trip trip) {
         this.id = trip.getId();
         this.title = trip.getTitle();
@@ -66,9 +68,21 @@ public class TripResponseDTO {
                                         item.getStartTime().toLocalDate()) + 1;
                                 return "Day " + (dayNum > 0 ? dayNum : 1);
                             },
-                            TreeMap::new, 
-                            Collectors.toList() 
-                    ));
+                            TreeMap::new,
+                            Collectors.toList()));
+        }
+        // 4. Map Reservations with download URLs
+        if (trip.getReservations() != null) {
+            this.reservations = trip.getReservations().stream()
+                    .map(res -> {
+                        ReservationDTO rDto = new ReservationDTO();
+                        rDto.setId(res.getId());
+                        rDto.setFileName(res.getFileName());
+                        // Set the download URL for each reservation file
+                        rDto.setDownloadUrl("/api/trips/" + trip.getId() + "/reservations/download/" + res.getId());
+                        return rDto;
+                    })
+                    .collect(Collectors.toList());
         }
     }
 }

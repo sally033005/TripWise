@@ -49,3 +49,5 @@ build/
 
 # Local database data
 postgres-data/
+
+uploads/
