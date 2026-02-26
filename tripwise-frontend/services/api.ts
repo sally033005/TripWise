@@ -38,5 +38,23 @@ export const tripService = {
     updateItineraryItem: async (tripId: number, itemId: number, itemData: any) => {
         const response = await api.put(`/trips/${tripId}/itinerary/${itemId}`, itemData);
         return response.data;
+    },
+
+    // 7. Add a new expense to a trip
+    addExpense: async (tripId: number, data: any) => {
+        const response = await api.post(`/expenses/trip/${tripId}`, data);
+        return response.data;
+    },
+
+    // 8. Delete an expense from a trip
+    deleteExpense: async (expenseId: number) => {
+        await api.delete(`/expenses/${expenseId}`);
+    },
+
+    // 9. Update the total budget of a trip
+    updateTripBudget: async (tripId: number, totalBudget: number) => {
+        await api.patch(`/trips/${tripId}/budget`, totalBudget, {
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 };

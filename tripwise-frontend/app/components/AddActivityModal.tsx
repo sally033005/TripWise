@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { tripService } from "@/services/api";
 
 interface Props {
@@ -8,15 +8,33 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialDate?: string | null;
 }
 
-export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess }: Props) {
+export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess, initialDate }: Props) {
   const [formData, setFormData] = useState({
     activity: '',
     location: '',
     startTime: '',
     notes: ''
   });
+
+  useEffect(() => {
+    if (isOpen) {
+        if (initialDate) {
+            const defaultTime = "09:00"; 
+            setFormData(prev => ({
+                ...prev,
+                startTime: `${initialDate}T${defaultTime}`
+            }));
+        } else {
+            const today = new Date().toISOString().slice(0, 16);
+            setFormData(prev => ({ ...prev, startTime: today }));
+        }
+    } else {
+        setFormData({ activity: "", location: "", startTime: "", notes: "" });
+    }
+}, [isOpen, initialDate]);
 
   if (!isOpen) return null;
 
@@ -53,6 +71,7 @@ export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess }:
             <input 
               type="datetime-local" required
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl"
+              value={formData.startTime}
               onChange={(e) => setFormData({...formData, startTime: e.target.value})}
             />
           </div>

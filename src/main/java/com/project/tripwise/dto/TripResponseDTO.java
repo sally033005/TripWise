@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.Comparator;
 
+import com.project.tripwise.model.Expense;
 import com.project.tripwise.model.ItineraryItem;
 import com.project.tripwise.model.Trip;
 import com.project.tripwise.model.User;
@@ -26,10 +27,12 @@ public class TripResponseDTO {
     private String description;
     private String creatorName;
     private List<String> collaboratorNames;
-
     private Map<String, List<ItineraryItemDTO>> dailyItinerary;
-
     private List<ReservationDTO> reservations;
+    private Double totalBudget;
+    private Double totalSpent;
+    private Map<String, Double> spentByPerson;
+    private List<ExpenseDTO> expenses;
 
     public TripResponseDTO(Trip trip) {
         this.id = trip.getId();
@@ -38,6 +41,7 @@ public class TripResponseDTO {
         this.startDate = trip.getStartDate();
         this.endDate = trip.getEndDate();
         this.description = trip.getDescription();
+        this.totalBudget = trip.getTotalBudget();
 
         // 1. Map Creator Name
         if (trip.getCreator() != null) {
@@ -79,5 +83,26 @@ public class TripResponseDTO {
                     })
                     .collect(Collectors.toList());
         }
+
+        // 5. Map Expenses and calculate totals
+        this.totalSpent = trip.getExpenses().stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        this.spentByPerson = trip.getExpenses().stream()
+                .collect(Collectors.groupingBy(
+                        Expense::getPaidBy,
+                        Collectors.summingDouble(Expense::getAmount)));
+
+        this.expenses = trip.getExpenses().stream()
+                .map(e -> {
+                    ExpenseDTO dto = new ExpenseDTO();
+                    dto.setId(e.getId());
+                    dto.setDescription(e.getDescription());
+                    dto.setAmount(e.getAmount());
+                    dto.setCategory(e.getCategory());
+                    dto.setPaidBy(e.getPaidBy());
+                    return dto;
+                }).collect(Collectors.toList());
     }
 }

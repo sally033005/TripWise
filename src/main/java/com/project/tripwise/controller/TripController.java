@@ -161,4 +161,14 @@ public class TripController {
             }
         }).orElse(ResponseEntity.notFound().build());
     }
+
+    // 11. Update the total budget of a trip
+    @PatchMapping("/{id}/budget")
+    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Double totalBudget) {
+        return tripRepository.findById(id).map(trip -> {
+            trip.setTotalBudget(totalBudget);
+            tripRepository.save(trip);
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

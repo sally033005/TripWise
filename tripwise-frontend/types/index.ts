@@ -28,10 +28,30 @@ export interface TripResponseDTO {
   endDate: string;
   creator: User;
   collaborators: User[];
+  totalBudget: number;
+  totalSpent: number;
+  spentByPerson: Record<string, number>;
+  expenses: ExpenseDTO[];
 
   // The daily itinerary is a mapping of date strings (e.g., "2024-07-01") to arrays of itinerary items for that day.
   dailyItinerary: {
     [key: string]: ItineraryItem[];
   };
   reservations: ReservationDTO[];
+}
+
+export enum ExpenseCategory {
+  TRANSPORTATION = "TRANSPORTATION",
+  FOOD = "FOOD",
+  ACCOMMODATION = "ACCOMMODATION",
+  SHOPPING = "SHOPPING",
+  OTHERS = "OTHERS"
+}
+
+export interface ExpenseDTO {
+  id?: number;
+  description: string;
+  amount: number;
+  category: ExpenseCategory;
+  paidBy: string;
 }
