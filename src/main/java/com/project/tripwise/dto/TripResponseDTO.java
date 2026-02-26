@@ -3,7 +3,6 @@ package com.project.tripwise.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.temporal.ChronoUnit;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +62,8 @@ public class TripResponseDTO {
                         return itemDto;
                     })
                     .collect(Collectors.groupingBy(
-                            item -> {
-                                long dayNum = ChronoUnit.DAYS.between(trip.getStartDate(),
-                                        item.getStartTime().toLocalDate()) + 1;
-                                return "Day " + (dayNum > 0 ? dayNum : 1);
-                            },
-                            TreeMap::new,
+                            item -> item.getStartTime().toLocalDate().toString(), // Group by date string
+                            TreeMap::new, // Use TreeMap to keep keys sorted
                             Collectors.toList()));
         }
         // 4. Map Reservations with download URLs

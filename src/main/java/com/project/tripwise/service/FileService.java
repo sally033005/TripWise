@@ -13,6 +13,7 @@ public class FileService {
 
     private final Path fileStorageLocation;
 
+    // Initialize the file storage location from application properties
     public FileService(@Value("${file.upload-dir}") String uploadDir) {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         try {
@@ -22,6 +23,7 @@ public class FileService {
         }
     }
 
+    // Store the file and return the stored file name/path
     public String storeFile(MultipartFile file) {
         // Generate a unique file name to prevent overwriting existing files
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
@@ -32,6 +34,16 @@ public class FileService {
             return fileName;
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
+        }
+    }
+
+    // Delete a file by its name
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Files.deleteIfExists(filePath);
+        } catch (IOException ex) {
+            throw new RuntimeException("Could not delete file " + fileName + ". Please try again!", ex);
         }
     }
 }

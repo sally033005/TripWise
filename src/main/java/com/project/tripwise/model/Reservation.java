@@ -15,6 +15,7 @@ public class Reservation {
     private String fileName;
     private String fileType;
     private String filePath;
+    private String downloadUrl;
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
