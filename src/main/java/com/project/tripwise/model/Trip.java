@@ -39,6 +39,9 @@ public class Trip {
 
     private Double totalBudget = 0.0;
 
+    @Column(name = "cover_photo")
+    private String coverPhoto;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Foreign Key
     @JsonIgnoreProperties("trips") // To prevent infinite recursion during JSON serialization

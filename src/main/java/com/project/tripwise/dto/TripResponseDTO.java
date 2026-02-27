@@ -33,6 +33,7 @@ public class TripResponseDTO {
     private Double totalSpent;
     private Map<String, Double> spentByPerson;
     private List<ExpenseDTO> expenses;
+    private String coverPhoto;
 
     public TripResponseDTO(Trip trip) {
         this.id = trip.getId();
@@ -42,6 +43,7 @@ public class TripResponseDTO {
         this.endDate = trip.getEndDate();
         this.description = trip.getDescription();
         this.totalBudget = trip.getTotalBudget();
+        this.coverPhoto = trip.getCoverPhoto();
 
         // 1. Map Creator Name
         if (trip.getCreator() != null) {

@@ -1,9 +1,14 @@
 package com.project.tripwise.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.util.Map;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 
 import com.project.tripwise.repository.ItineraryItemRepository;
 import com.project.tripwise.repository.TripRepository;
@@ -15,6 +20,7 @@ import com.project.tripwise.model.ItineraryItem;
 import com.project.tripwise.model.Reservation;
 import com.project.tripwise.model.Trip;
 
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -170,5 +176,43 @@ public class TripController {
             tripRepository.save(trip);
             return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // 12. Upload a cover photo for a trip
+    @PostMapping("/{id}/upload-cover")
+    public ResponseEntity<?> uploadCoverPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return tripRepository.findById(id).map(trip -> {
+            try {
+                String storedFileName = fileService.storeFile(file);
+
+                trip.setCoverPhoto("/api/trips/cover/" + storedFileName);
+                tripRepository.save(trip);
+
+                return ResponseEntity.ok().body(Map.of("coverUrl", trip.getCoverPhoto()));
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to upload image: " + e.getMessage());
+            }
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // 13. Get the cover photo for a trip
+    @GetMapping("/cover/{fileName}")
+    public ResponseEntity<Resource> getCoverPhoto(@PathVariable String fileName) {
+        try {
+            java.nio.file.Path filePath = java.nio.file.Paths.get("./uploads").toAbsolutePath().resolve(fileName)
+                    .normalize();
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(
+                    filePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

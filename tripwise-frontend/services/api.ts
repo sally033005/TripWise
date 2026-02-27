@@ -20,7 +20,7 @@ export const tripService = {
 
     // 3. Detele reservation by ID
     deleteReservation: async (resId: number) => {
-        await api.delete(`/reservations/${resId}`); 
+        await api.delete(`/reservations/${resId}`);
     },
 
     // 4. Add a new itinerary item to a trip
@@ -56,5 +56,17 @@ export const tripService = {
         await api.patch(`/trips/${tripId}/budget`, totalBudget, {
             headers: { 'Content-Type': 'application/json' }
         });
-    }
+    },
+
+    // 10. Upload a cover photo for a trip
+    uploadCoverPhoto: async (tripId: number, file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await api.post(`/trips/${tripId}/upload-cover`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+        });
+        return response.data;
+    },
 };
