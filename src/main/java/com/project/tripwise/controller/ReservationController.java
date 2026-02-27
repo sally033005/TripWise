@@ -1,6 +1,8 @@
 package com.project.tripwise.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -36,28 +38,28 @@ public class ReservationController {
     // 2. Download or preview a reservation file
     @GetMapping("/download/{reservationId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long reservationId) {
-        // A. Find the reservation record in the database using the reservationId
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id " + reservationId));
+                .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
         try {
-            // B. Retrieve the file from the server using the stored file path
             Path filePath = Paths.get("./uploads").toAbsolutePath().resolve(reservation.getFilePath()).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists()) {
-                // C. Return the file as a response, setting the appropriate content type and
-                // headers for download or preview
                 String contentType = reservation.getFileType();
-                if (contentType == null)
-                    contentType = "application/octet-stream";
+                if (contentType == null) {
+                    try {
+                        contentType = Files.probeContentType(filePath);
+                    } catch (IOException e) {
+                        contentType = "application/octet-stream";
+                    }
+                }
 
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
-                        // Set the Content-Disposition header to inline for preview or attachment for
-                        // download
                         .header(HttpHeaders.CONTENT_DISPOSITION,
                                 "inline; filename=\"" + reservation.getFileName() + "\"")
+                        .header(HttpHeaders.CACHE_CONTROL, "no-cache")
                         .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
@@ -69,7 +71,7 @@ public class ReservationController {
 
     // 3. Delete a reservation file
     @DeleteMapping("/{reservationId}")
-    public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId) { // 移除了 tripId
+    public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId) { 
         return reservationRepository.findById(reservationId).map(reservation -> {
             // A. Find the reservation record in the database using the reservationId
             String fileNameInFolder = reservation.getFilePath();

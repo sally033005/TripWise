@@ -69,4 +69,19 @@ export const tripService = {
         });
         return response.data;
     },
+
+    // 11. Upload a reservation file with a category
+    uploadReservation: async (tripId: number, file: File, category: string, description: string) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("category", category);
+        formData.append("description", description);
+
+        const response = await api.post(`/trips/${tripId}/reservations/upload`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+        });
+        return response.data;
+    },
 };

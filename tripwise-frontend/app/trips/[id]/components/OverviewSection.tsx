@@ -7,10 +7,8 @@ interface OverviewProps {
 }
 
 export default function OverviewSection({ trip }: OverviewProps) {
-
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Handle file input change for cover photo upload
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && trip.id) {
@@ -23,12 +21,10 @@ export default function OverviewSection({ trip }: OverviewProps) {
         }
     };
 
-    // Use the trip's cover photo if available, otherwise fallback to a default image
     const coverImageUrl = trip.coverPhoto
         ? `http://localhost:8080${trip.coverPhoto}`
         : "https://images.unsplash.com/photo-1514894780063-5881f76e84d4?q=80&w=2070";
 
-    // Calculate the number of days for the trip (inclusive of start and end date)
     const calculateDays = () => {
         const start = new Date(trip.startDate);
         const end = new Date(trip.endDate);
@@ -49,13 +45,14 @@ export default function OverviewSection({ trip }: OverviewProps) {
     );
 
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-6 pb-10 transition-colors duration-300">
             {/* 1. Main Banner Card */}
-            <div className="relative h-[350px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl group bg-gray-200">
+            <div className="relative h-[350px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl group bg-card">
                 <img
                     src={coverImageUrl}
                     className="absolute inset-0 w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                 <div className="absolute bottom-6 right-6">
                     <input
@@ -75,7 +72,7 @@ export default function OverviewSection({ trip }: OverviewProps) {
                 </div>
                 <div className="absolute bottom-8 left-8 text-white">
                     <h1 className="text-4xl font-black mb-2">{trip.title || trip.destination}</h1>
-                    <div className="flex items-center gap-4 text-sm font-medium opacity-90">
+                    <div className="flex items-center gap-4 text-sm font-medium text-white/90">
                         <span className="flex items-center gap-1">📍 {trip.destination}</span>
                         <span className="flex items-center gap-1">📅 {trip.startDate} - {trip.endDate}</span>
                     </div>
@@ -84,47 +81,38 @@ export default function OverviewSection({ trip }: OverviewProps) {
 
             {/* 2. Info Grid (Three Cards) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center gap-2 text-gray-400 text-xs font-black uppercase tracking-wider mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            Countdown
-                        </div>
-                        <div className="text-4xl font-black text-gray-900">{getCountdown()} Days</div>
-                    </div>
-                    <p className="text-gray-400 text-sm mt-2 font-medium">until your trip starts</p>
-                </div>
+                {[
+                    { label: "Countdown", value: `${getCountdown()} Days`, sub: "until trip starts", icon: "🕒" },
+                    { label: "Total Spent", value: `$${trip.totalSpent.toLocaleString()}`, sub: "spent so far", icon: "💰" },
+                    { label: "Itinerary", value: `${totalActivities} Items`, sub: "planned activities", icon: "📅" }
+                ].map((item, idx) => (
+                    <div
+                        key={idx}
+                        className="bg-card p-8 rounded-[2rem] border border-card-border shadow-sm flex flex-col justify-between transition-all duration-300"
+                    >
+                        <div>
+                            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-300 text-xs font-black uppercase tracking-wider mb-4">
+                                <span className="text-base">{item.icon}</span> {item.label}
+                            </div>
 
-                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center gap-2 text-gray-400 text-xs font-black uppercase tracking-wider mb-4">
-                            <span className="text-lg">💰</span>
-                            Total Spent
+                            <div className="text-4xl font-black text-main-text transition-colors">
+                                {item.value}
+                            </div>
                         </div>
-                        <div className="text-4xl font-black text-gray-900">${trip.totalSpent.toLocaleString()}</div>
-                    </div>
-                    <p className="text-gray-400 text-sm mt-2 font-medium">spent so far</p>
-                </div>
 
-                <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center gap-2 text-gray-400 text-xs font-black uppercase tracking-wider mb-4">
-                            <span className="text-lg">📅</span>
-                            Itinerary
-                        </div>
-                        <div className="text-4xl font-black text-gray-900">{totalActivities} Items</div>
+                        <p className="text-slate-500 dark:text-slate-300 text-sm mt-4 font-medium">
+                            {item.sub}
+                        </p>
                     </div>
-                    <p className="text-gray-400 text-sm mt-2 font-medium">planned activities</p>
-                </div>
+                ))}
             </div>
 
             {/* 3. Quick Summary Section */}
-            <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
-                <h4 className="text-lg font-black text-gray-900 mb-4">Quick Summary</h4>
-                <p className="text-gray-500 leading-relaxed font-medium">
-                    You are traveling to <span className="text-gray-900 font-bold">{trip.destination}</span> for <span className="text-gray-900 font-bold">{calculateDays()} days</span>.
-                    You have <span className="text-gray-900 font-bold">{trip.reservations.length}</span> reservations,
-                    and <span className="text-gray-900 font-bold">{totalActivities}</span> activities planned.
+            <div className="bg-card p-8 rounded-[2rem] border border-card-border shadow-sm transition-all duration-300">
+                <h4 className="text-lg font-black text-main-text mb-4">Quick Summary</h4>
+                <p className="text-slate-500 dark:text-slate-300 leading-relaxed font-medium">
+                    You are traveling to <span className="text-main-text font-bold">{trip.destination}</span> for <span className="text-main-text font-bold">{calculateDays()} days</span>.
+                    You have <span className="text-main-text font-bold">{trip.reservations.length}</span> reservations.
                 </p>
             </div>
         </div>

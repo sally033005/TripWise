@@ -17,6 +17,8 @@ export interface ReservationDTO {
   id: number;
   fileName: string;
   downloadUrl: string;
+  category: string;
+  description?: string;
 }
 
 export interface TripResponseDTO {

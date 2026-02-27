@@ -147,20 +147,25 @@ public class TripController {
 
     // 10. Upload a reservation file for a trip
     @PostMapping("/{tripId}/reservations/upload")
-    public ResponseEntity<?> uploadReservation(@PathVariable Long tripId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadReservation(
+            @PathVariable Long tripId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("category") String category,
+            @RequestParam(value = "description", required = false) String description
+    ) {
         return tripRepository.findById(tripId).map(trip -> {
             try {
-                String storedFileName = fileService.storeFile(file); // a. Store the file and get the stored file
-                                                                     // name/path
+                String storedFileName = fileService.storeFile(file);
 
                 Reservation res = new Reservation();
                 res.setFileName(file.getOriginalFilename());
                 res.setFilePath(storedFileName);
-                res.setDownloadUrl("/api/files/download/" + storedFileName);
-                res.setTrip(trip); // b. Set the trip reference in the reservation record
+                res.setDownloadUrl("/api/reservations/download/" + storedFileName);
+                res.setCategory(category);
+                res.setDescription(description);
+                res.setTrip(trip);
 
-                reservationRepository.save(res); // c. Save the reservation record in the database
-
+                reservationRepository.save(res);
                 return ResponseEntity.ok("Uploaded");
             } catch (Exception e) {
                 return ResponseEntity.internalServerError().build();

@@ -79,6 +79,8 @@ public class TripResponseDTO {
                         ReservationDTO rDto = new ReservationDTO();
                         rDto.setId(res.getId());
                         rDto.setFileName(res.getFileName());
+                        rDto.setCategory(res.getCategory());
+                        rDto.setDescription(res.getDescription());
                         // Set the download URL for each reservation file
                         rDto.setDownloadUrl("/api/trips/" + trip.getId() + "/reservations/download/" + res.getId());
                         return rDto;

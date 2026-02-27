@@ -1,26 +1,37 @@
 @import "tailwindcss";
 
+/* 🌟 Tailwind v4 手動開啟 Class 模式 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* 將 Tailwind Class 連結到 CSS 變數 */
+  --color-card: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-main-text: var(--foreground);
+}
+
+/* ☀️ Light Mode */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111827;      /* 深灰字 */
+  --card-bg: #ffffff;         /* 白色卡片 */
+  --card-border: #f3f4f6;     /* 淺灰邊框 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 🌙 Dark Mode */
+.dark {
+  --background: #030712;      /* 極深藍背景 */
+  --foreground: #f8fafc;      /* 近白色字 */
+  --card-bg: #111827;         /* 深藍黑色卡片 */
+  --card-border: #1e293b;     /* 深藍灰邊框 */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

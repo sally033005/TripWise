@@ -11,4 +11,6 @@ public class ReservationDTO {
     private Long id;
     private String fileName;
     private String downloadUrl;
+    private String category;
+    private String description;
 }
