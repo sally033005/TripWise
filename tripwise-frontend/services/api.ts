@@ -84,4 +84,21 @@ export const tripService = {
         });
         return response.data;
     },
+
+    // 12. Create a new trip
+    createTrip: async (tripData: any) => {
+        const response = await api.post<TripResponseDTO>('/trips', tripData);
+        return response.data;
+    },
+
+    // 13. Delete a trip
+    deleteTrip: async (tripId: number) => {
+        await api.delete(`/trips/${tripId}`);
+    },
+
+    // 14. Update an existing trip
+    updateTrip: async (tripId: number, tripData: any) => {
+        const response = await api.put<TripResponseDTO>(`/trips/${tripId}`, tripData);
+        return response.data;
+    },
 };

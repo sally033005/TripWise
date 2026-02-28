@@ -3,9 +3,9 @@
 import { TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
 import { useEffect, useState } from "react";
-import AddActivityModal from "@/app/components/AddActivityModal";
+import AddActivityModal from "@/app/trips/[id]/components/AddActivityModal";
 import { useParams } from "next/navigation";
-import EditActivityModal from "@/app/components/EditActivityModal";
+import EditActivityModal from "@/app/trips/[id]/components/EditActivityModal";
 
 export default function ItinerarySection() {
     const [isModalOpen, setIsModalOpen] = useState(false);

@@ -4,7 +4,7 @@ import { TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import AddReservationModal from "@/app/components/AddReservationModal";
+import AddReservationModal from "@/app/trips/[id]/components/AddReservationModal";
 
 const CATEGORY_MAP: Record<string, { icon: string; label: string; color: string; iconColor: string }> = {
     FLIGHT: { icon: "✈️", label: "Flight", color: "bg-indigo-50", iconColor: "text-indigo-600" },

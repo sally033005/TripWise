@@ -71,14 +71,17 @@ public class TripController {
 
     // 4. Update an existing trip
     @PutMapping("/{id}")
-    public ResponseEntity<Trip> updateTrip(@PathVariable Long id, @RequestBody Trip tripDetails) {
+    public ResponseEntity<TripResponseDTO> updateTrip(@PathVariable Long id, @RequestBody Trip tripDetails) {
         return tripRepository.findById(id).map(trip -> {
             trip.setTitle(tripDetails.getTitle());
             trip.setDestination(tripDetails.getDestination());
             trip.setStartDate(tripDetails.getStartDate());
             trip.setEndDate(tripDetails.getEndDate());
             trip.setDescription(tripDetails.getDescription());
-            return ResponseEntity.ok(tripRepository.save(trip));
+            trip.setTotalBudget(tripDetails.getTotalBudget());
+
+            Trip updatedTrip = tripRepository.save(trip);
+            return ResponseEntity.ok(new TripResponseDTO(updatedTrip));
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -86,12 +89,23 @@ public class TripController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
         return tripRepository.findById(id).map(trip -> {
-            // Delete associated itinerary items
-            trip.getReservations().forEach(res -> fileService.deleteFile(res.getFilePath()));
-
-            // Delete the trip itself
+            // Delete associated files before deleting the trip record
+            if (trip.getReservations() != null) {
+                trip.getReservations().forEach(res -> {
+                    if (res.getFilePath() != null) {
+                        fileService.deleteFile(res.getFilePath());
+                    }
+                });
+            }
+            if (trip.getCoverPhoto() != null) {
+                String fileName = trip.getCoverPhoto();
+                if (fileName.contains("/")) {
+                    fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                }
+                System.out.println("Deleting cover photo file: " + fileName);
+                fileService.deleteFile(fileName);
+            }
             tripRepository.delete(trip);
-
             return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -151,8 +165,7 @@ public class TripController {
             @PathVariable Long tripId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("category") String category,
-            @RequestParam(value = "description", required = false) String description
-    ) {
+            @RequestParam(value = "description", required = false) String description) {
         return tripRepository.findById(tripId).map(trip -> {
             try {
                 String storedFileName = fileService.storeFile(file);
