@@ -51,3 +51,25 @@ build/
 postgres-data/
 
 uploads/
+
+# Java & Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+*.jar
+*.war
+*.ear
+
+# IntelliJ / Eclipse / VS Code (Java)
+.settings/
+.project
+.classpath
+.factorypath
+.idea/
+*.iml
+*.iws
+.vscode/bin/
+.vscode/obj/
