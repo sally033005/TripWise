@@ -15,6 +15,7 @@ import com.project.tripwise.repository.TripRepository;
 import com.project.tripwise.repository.UserRepository;
 import com.project.tripwise.repository.ReservationRepository;
 import com.project.tripwise.service.FileService;
+import com.project.tripwise.service.TripService;
 import com.project.tripwise.dto.TripResponseDTO;
 import com.project.tripwise.model.ItineraryItem;
 import com.project.tripwise.model.Reservation;
@@ -44,10 +45,16 @@ public class TripController {
     @Autowired
     private FileService fileService;
 
+    private final TripService tripService;
+
+    public TripController(TripService tripService) {
+        this.tripService = tripService;
+    }
+
     // 1. Get all trips
     @GetMapping
     public List<TripResponseDTO> getAllTrips() {
-        return tripRepository.findAll().stream()
+        return tripService.getAllTripsForUser().stream()
                 .map(TripResponseDTO::new)
                 .collect(Collectors.toList());
     }
@@ -55,7 +62,7 @@ public class TripController {
     // 2. Get a trip by ID
     @GetMapping("/{id}")
     public ResponseEntity<TripResponseDTO> getTripById(@PathVariable Long id) {
-        return tripRepository.findById(id)
+        return tripService.getTripById(id)
                 .map(trip -> ResponseEntity.ok(new TripResponseDTO(trip)))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -63,10 +70,12 @@ public class TripController {
     // 3. Create a new trip
     @PostMapping
     public ResponseEntity<Trip> createTrip(@RequestBody Trip trip) {
-        return userRepository.findById(1L).map(user -> {
-            trip.setCreator(user);
-            return ResponseEntity.ok(tripRepository.save(trip));
-        }).orElse(ResponseEntity.badRequest().build());
+        try {
+            Trip savedTrip = tripService.createTrip(trip);
+            return ResponseEntity.ok(savedTrip);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     // 4. Update an existing trip

@@ -44,6 +44,7 @@ public class TripResponseDTO {
         this.description = trip.getDescription();
         this.totalBudget = trip.getTotalBudget();
         this.coverPhoto = trip.getCoverPhoto();
+        this.dailyItinerary = new TreeMap<>();
 
         // 1. Map Creator Name
         if (trip.getCreator() != null) {

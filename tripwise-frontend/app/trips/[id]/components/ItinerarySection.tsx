@@ -88,7 +88,7 @@ export default function ItinerarySection() {
                                 </span>
                             </div>
 
-                            {trip.dailyItinerary[selectedDate]?.length > 0 ? (
+                            { (trip.dailyItinerary?.[selectedDate] ?? []).length > 0 ? (
                                 <div className="space-y-4">
                                     {trip.dailyItinerary[selectedDate].map((item) => (
                                         <div key={item.id} className="group relative bg-card border border-card-border p-5 rounded-3xl shadow-sm hover:shadow-md hover:border-blue-500/30 transition-all">

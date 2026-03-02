@@ -2,8 +2,32 @@ import axios from 'axios';
 import { TripResponseDTO, ItineraryItem } from '../types';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api',
-});
+    baseURL: "http://localhost:8080/api",
+    withCredentials: true,
+  });
+
+  api.interceptors.request.use(
+    (config) => {
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Response interceptor to handle 401 Unauthorized errors globally
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Unauthorized - redirect to login page
+            window.location.href = "/login";
+        }
+        return Promise.reject(error);
+    }
+);
+
+export default api;
 
 export const tripService = {
     // 1. Get all trips for the user
