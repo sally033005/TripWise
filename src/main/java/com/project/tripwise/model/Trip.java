@@ -44,12 +44,12 @@ public class Trip {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Foreign Key
-    @JsonIgnoreProperties("trips") // To prevent infinite recursion during JSON serialization
+    @JsonIgnoreProperties({"trips", "collaboratedTrips", "password"}) // To prevent infinite recursion during JSON serialization
     private User creator;
 
     @ManyToMany
     @JoinTable(name = "trip_collaborators", joinColumns = @JoinColumn(name = "trip_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonIgnoreProperties("trips") // To prevent infinite recursion during JSON serialization
+    @JsonIgnoreProperties({"trips", "collaboratedTrips", "password"}) // To prevent infinite recursion during JSON serialization
     private List<User> collaborators = new ArrayList<>();
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)

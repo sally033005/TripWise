@@ -28,7 +28,7 @@ public class TripService {
 
     public List<Trip> getAllTripsForUser() {
         User user = getCurrentUser();
-        return tripRepository.findByCreatorId(user.getId());
+        return tripRepository.findByCreatorIdOrCollaboratorsId(user.getId(), user.getId());
     }
 
     public Optional<Trip> getTripById(Long id) {
@@ -37,7 +37,51 @@ public class TripService {
 
     public Trip createTrip(Trip trip) {
         User user = getCurrentUser();
-        trip.setCreator(user); 
+        trip.setCreator(user);
         return tripRepository.save(trip);
+    }
+
+    public String addCollaborator(Long tripId, String username) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
+    
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!trip.getCreator().getUsername().equals(currentUsername)) {
+            throw new RuntimeException("Only the creator can add collaborators!");
+        }
+    
+        User userToAdd = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User '" + username + "' not found"));
+    
+        if (trip.getCollaborators().contains(userToAdd)) {
+            return "User " + username + " is already a collaborator.";
+        }
+    
+        trip.getCollaborators().add(userToAdd);
+        tripRepository.save(trip);
+        
+        return "Successfully added " + username + " to trip " + trip.getTitle();
+    }
+
+    public String removeSelfFromCollaborators(Long tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
+    
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        if (trip.getCreator().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Creators cannot remove themselves. You must delete the trip instead.");
+        }
+    
+        if (!trip.getCollaborators().contains(currentUser)) {
+            throw new RuntimeException("You are not a collaborator of this trip.");
+        }
+        
+        trip.getCollaborators().remove(currentUser);
+        tripRepository.save(trip);
+    
+        return "You have successfully left the trip: " + trip.getTitle();
     }
 }

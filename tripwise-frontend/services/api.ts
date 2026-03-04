@@ -4,9 +4,9 @@ import { TripResponseDTO, ItineraryItem } from '../types';
 const api = axios.create({
     baseURL: "http://localhost:8080/api",
     withCredentials: true,
-  });
+});
 
-  api.interceptors.request.use(
+api.interceptors.request.use(
     (config) => {
         return config;
     },
@@ -123,6 +123,20 @@ export const tripService = {
     // 14. Update an existing trip
     updateTrip: async (tripId: number, tripData: any) => {
         const response = await api.put<TripResponseDTO>(`/trips/${tripId}`, tripData);
+        return response.data;
+    },
+
+    // 15. Add a collaborator (Invite)
+    addCollaborator: async (tripId: number, username: string) => {
+        const response = await api.post(`/trips/${tripId}/collaborators`, {
+            username
+        });
+        return response.data;
+    },
+
+    // 16. Remove self from collaborators (Leave trip)
+    leaveTrip: async (tripId: number) => {
+        const response = await api.delete(`/trips/${tripId}/collaborators/self`);
         return response.data;
     },
 };

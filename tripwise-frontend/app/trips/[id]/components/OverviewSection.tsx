@@ -1,6 +1,7 @@
 import { TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
 import { useRef } from "react";
+import CollaboratorList from "./CollaboratorList";
 
 interface OverviewProps {
     trip: TripResponseDTO;
@@ -114,6 +115,15 @@ export default function OverviewSection({ trip }: OverviewProps) {
                     You are traveling to <span className="text-main-text font-bold">{trip.destination}</span> for <span className="text-main-text font-bold">{calculateDays()} days</span>.
                     You have <span className="text-main-text font-bold">{trip.reservations.length}</span> reservations.
                 </p>
+            </div>
+
+            {/* 4. Collaborators Section */}
+            <div className="bg-card p-8 rounded-[2rem] border border-card-border shadow-sm transition-all duration-300">
+                <h4 className="text-lg font-black text-main-text mb-4">Travel Partners</h4>
+                <CollaboratorList
+                    creatorName={trip.creatorName}
+                    collaboratorNames={trip.collaboratorNames || []}
+                />
             </div>
         </div>
     );

@@ -28,15 +28,14 @@ export interface TripResponseDTO {
   destination: string;
   startDate: string;
   endDate: string;
-  creator: User;
-  collaborators: User[];
+  creatorName: string;
+  collaboratorNames: string[];
   totalBudget: number;
   totalSpent: number;
   spentByPerson: Record<string, number>;
   expenses: ExpenseDTO[];
   coverPhoto?: string;
 
-  // The daily itinerary is a mapping of date strings (e.g., "2024-07-01") to arrays of itinerary items for that day.
   dailyItinerary: {
     [key: string]: ItineraryItem[];
   };

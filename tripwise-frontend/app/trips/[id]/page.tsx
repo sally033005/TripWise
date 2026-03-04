@@ -1,26 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState, use } from "react";
+// import { useParams } from "next/navigation";
 import { tripService } from "../../../services/api";
 import { TripResponseDTO } from "../../../types";
 import OverviewSection from "./components/OverviewSection";
 import ItinerarySection from "./components/ItinerarySection";
 import ExpensesSection from "./components/ExpensesSection";
 import ReservationsSection from "./components/ReservationsSection";
+import InviteModal from "./components/InviteModal";
 
 type TabType = 'overview' | 'itinerary' | 'expenses' | 'reservations';
 
-export default function TripDetail() {
-    const { id } = useParams();
+export default function TripDetail({ params }: { params: Promise<{ id: string }> }) {
+    const unwrappedParams = use(params);
+    const tripId = parseInt(unwrappedParams.id);
     const [trip, setTrip] = useState<TripResponseDTO | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('overview');
+    const [isInviteOpen, setIsInviteOpen] = useState(false);
+    
+    const refreshData = async () => {
+        if (!isNaN(tripId)) {
+            const updatedTrip = await tripService.getTripById(tripId);
+            setTrip(updatedTrip);
+        }
+    };
 
     useEffect(() => {
-        if (id) {
-            tripService.getTripById(Number(id)).then(setTrip);
+        if (!isNaN(tripId)) {
+            tripService.getTripById(tripId).then(setTrip);
         }
-    }, [id]);
+    }, [tripId]);
 
     if (!trip) return <div className="p-10 text-center text-main-text">Loading Details...</div>;
 
@@ -30,6 +40,13 @@ export default function TripDetail() {
             <section className="border-b border-card-border pb-4">
                 <h1 className="text-4xl font-extrabold text-main-text">{trip.title}</h1>
                 <p className="text-slate-500 dark:text-slate-400">📍 {trip.destination}</p>
+                {/* Invite Button */}
+                <button
+                    onClick={() => setIsInviteOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-all"
+                >
+                    <span className="text-lg">+</span> Invite Partner
+                </button>
             </section>
 
             {/* 2. Tabs Navigation */}
@@ -38,11 +55,10 @@ export default function TripDetail() {
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`pb-4 text-sm font-bold capitalize transition-all relative ${
-                            activeTab === tab 
-                            ? "text-blue-600 dark:text-blue-400" 
+                        className={`pb-4 text-sm font-bold capitalize transition-all relative ${activeTab === tab
+                            ? "text-blue-600 dark:text-blue-400"
                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                        }`}
+                            }`}
                     >
                         {tab}
                         {activeTab === tab && (
@@ -59,6 +75,15 @@ export default function TripDetail() {
                 {activeTab === 'expenses' && <ExpensesSection trip={trip} />}
                 {activeTab === 'reservations' && <ReservationsSection />}
             </div>
+
+            <InviteModal
+                tripId={tripId}
+                isOpen={isInviteOpen}
+                onClose={() => setIsInviteOpen(false)}
+                onSuccess={(name) => {
+                    refreshData();
+                }}
+            />
         </main>
     );
 }

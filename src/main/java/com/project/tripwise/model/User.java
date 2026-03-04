@@ -3,8 +3,6 @@ package com.project.tripwise.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,12 +33,14 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String password;
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Trip> trips;
 
-    @ManyToMany
-    @JsonIgnoreProperties("collaborators")
+    @ManyToMany(mappedBy = "collaborators")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Trip> collaboratedTrips = new ArrayList<>();
 }

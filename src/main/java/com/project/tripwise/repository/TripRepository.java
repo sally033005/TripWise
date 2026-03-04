@@ -9,4 +9,5 @@ import com.project.tripwise.model.Trip;
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> findByCreatorId(Long creatorId);
+    List<Trip> findByCreatorIdOrCollaboratorsId(Long creatorId, Long collaboratorId);
 }

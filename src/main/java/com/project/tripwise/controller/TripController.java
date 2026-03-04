@@ -1,7 +1,6 @@
 package com.project.tripwise.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 
 import com.project.tripwise.repository.ItineraryItemRepository;
 import com.project.tripwise.repository.TripRepository;
-import com.project.tripwise.repository.UserRepository;
 import com.project.tripwise.repository.ReservationRepository;
 import com.project.tripwise.service.FileService;
 import com.project.tripwise.service.TripService;
@@ -21,7 +19,6 @@ import com.project.tripwise.model.ItineraryItem;
 import com.project.tripwise.model.Reservation;
 import com.project.tripwise.model.Trip;
 
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +26,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/trips")
 @CrossOrigin(origins = "http://localhost:3000")
 public class TripController {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private TripRepository tripRepository;
@@ -120,18 +114,11 @@ public class TripController {
     }
 
     // 6. Add a collaborator to a trip
-    @PostMapping("/{tripId}/collaborators/{username}")
-    public ResponseEntity<String> addCollaborator(@PathVariable Long tripId, @PathVariable String username) {
-        return tripRepository.findById(tripId).flatMap(trip -> userRepository.findByUsername(username).map(user -> {
-            if (!trip.getCollaborators().contains(user)) {
-                trip.getCollaborators().add(user);
-                tripRepository.save(trip);
-                return ResponseEntity
-                        .ok("Successfully added " + username + " as a collaborator to trip " + trip.getTitle());
-            }
-            return ResponseEntity.badRequest()
-                    .body("User " + username + " is already a collaborator on trip " + trip.getTitle());
-        })).orElse(ResponseEntity.notFound().build());
+    @PostMapping("/{id}/collaborators")
+    public ResponseEntity<?> addCollaborator(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String username = payload.get("username");
+        tripService.addCollaborator(id, username);
+        return ResponseEntity.ok(Map.of("message", "Collaborator added successfully"));
     }
 
     // 7. Add an itinerary item to a trip
@@ -240,6 +227,19 @@ public class TripController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 14. Remove self from collaborators
+    // URL: /api/trips/{tripId}/collaborators/self
+    @DeleteMapping("/{tripId}/collaborators/self")
+    public ResponseEntity<String> removeSelf(@PathVariable Long tripId) {
+        try {
+            String message = tripService.removeSelfFromCollaborators(tripId);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

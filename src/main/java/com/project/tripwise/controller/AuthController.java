@@ -5,7 +5,6 @@ import com.project.tripwise.dto.RegisterRequest;
 import com.project.tripwise.model.User;
 import com.project.tripwise.service.AuthService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
