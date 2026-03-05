@@ -1,6 +1,6 @@
 import { TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import CollaboratorList from "./CollaboratorList";
 
 interface OverviewProps {
@@ -44,6 +44,15 @@ export default function OverviewSection({ trip }: OverviewProps) {
     const totalActivities = Object.values(trip.dailyItinerary || {}).reduce(
         (acc, day) => acc + (day?.length || 0), 0
     );
+
+    const [currentUsername, setCurrentUsername] = useState<string>("");
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("username");
+        if (storedUser) {
+            setCurrentUsername(storedUser);
+        }
+    }, []);
 
     return (
         <div className="space-y-6 pb-10 transition-colors duration-300">
@@ -121,8 +130,10 @@ export default function OverviewSection({ trip }: OverviewProps) {
             <div className="bg-card p-8 rounded-[2rem] border border-card-border shadow-sm transition-all duration-300">
                 <h4 className="text-lg font-black text-main-text mb-4">Travel Partners</h4>
                 <CollaboratorList
+                    tripId={trip.id}
                     creatorName={trip.creatorName}
                     collaboratorNames={trip.collaboratorNames || []}
+                    currentUsername={currentUsername}
                 />
             </div>
         </div>
