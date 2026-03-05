@@ -3,6 +3,7 @@ package com.project.tripwise.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class TripController {
 
     // 2. Get a trip by ID
     @GetMapping("/{id}")
+    @PreAuthorize("@tripSecurity.isMember(#id)")
     public ResponseEntity<TripResponseDTO> getTripById(@PathVariable Long id) {
         return tripService.getTripById(id)
                 .map(trip -> ResponseEntity.ok(new TripResponseDTO(trip)))
@@ -74,6 +76,7 @@ public class TripController {
 
     // 4. Update an existing trip
     @PutMapping("/{id}")
+    @PreAuthorize("@tripSecurity.isMember(#id)")
     public ResponseEntity<TripResponseDTO> updateTrip(@PathVariable Long id, @RequestBody Trip tripDetails) {
         return tripRepository.findById(id).map(trip -> {
             trip.setTitle(tripDetails.getTitle());
@@ -90,6 +93,7 @@ public class TripController {
 
     // 5. Delete a trip
     @DeleteMapping("/{id}")
+    @PreAuthorize("@tripSecurity.isCreator(#id)")
     public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
         return tripRepository.findById(id).map(trip -> {
             // Delete associated files before deleting the trip record
@@ -123,6 +127,7 @@ public class TripController {
 
     // 7. Add an itinerary item to a trip
     @PostMapping("/{tripId}/itinerary")
+    @PreAuthorize("@tripSecurity.isMember(#tripId)")
     public ResponseEntity<ItineraryItem> addItineraryItem(@PathVariable Long tripId, @RequestBody ItineraryItem item) {
         return tripRepository.findById(tripId).map(trip -> {
             item.setTrip(trip); // Set the trip reference in the itinerary item
@@ -157,6 +162,7 @@ public class TripController {
 
     // 10. Upload a reservation file for a trip
     @PostMapping("/{tripId}/reservations/upload")
+    @PreAuthorize("@tripSecurity.isMember(#tripId)")
     public ResponseEntity<?> uploadReservation(
             @PathVariable Long tripId,
             @RequestParam("file") MultipartFile file,
