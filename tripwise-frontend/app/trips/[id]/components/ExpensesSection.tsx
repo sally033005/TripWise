@@ -1,14 +1,20 @@
+"use client";
+
 import { ExpenseCategory, TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
 import { useState } from "react";
 import AddExpenseModal from "./AddExpenseModal";
 
-export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
+interface ExpensesSectionProps {
+    trip: TripResponseDTO;
+    onUpdate: () => void;
+}
+
+export default function ExpensesSection({ trip, onUpdate }: ExpensesSectionProps) {
     const [isEditingBudget, setIsEditingBudget] = useState(false);
     const [tempBudget, setTempBudget] = useState(trip.totalBudget || 0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Calculate totals by category for the breakdown section
     const categoryTotals = trip.expenses?.reduce((acc, exp) => {
         acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
         return acc;
@@ -22,16 +28,20 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
         try {
             await tripService.updateTripBudget(trip.id, tempBudget);
             setIsEditingBudget(false);
-            window.location.reload();
-        } catch (err) { alert("Failed to update budget"); }
+            onUpdate();
+        } catch (err) {
+            alert("Failed to update budget");
+        }
     };
 
     const handleDeleteExpense = async (expenseId: number) => {
         if (confirm("Are you sure you want to delete this expense?")) {
             try {
                 await tripService.deleteExpense(expenseId);
-                window.location.reload();
-            } catch (err) { alert("Failed to delete expense"); }
+                onUpdate();
+            } catch (err) {
+                alert("Failed to delete expense");
+            }
         }
     };
 
@@ -39,9 +49,8 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
 
     return (
         <div className="space-y-8 transition-colors duration-300">
-            {/* 1. Top Dashboard: Black Card + Breakdown */}
+            {/* 1. Top Dashboard */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* 🖤 Black Card - Total Expenses & Editable Budget */}
                 <div className="lg:col-span-2 bg-slate-900 dark:bg-card border border-slate-800 p-10 rounded-[2.5rem] text-white flex flex-col justify-between min-h-[280px] shadow-2xl relative overflow-hidden group">
                     <div className="relative z-10 flex justify-between items-start">
                         <div>
@@ -96,12 +105,10 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
                             </p>
                         </div>
                     </div>
-
-                    {/* Background Decorative Circle */}
                     <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all duration-700"></div>
                 </div>
 
-                {/* 📊 Breakdown Card */}
+                {/* Breakdown Card */}
                 <div className="bg-card border border-card-border p-8 rounded-[2.5rem] shadow-sm">
                     <div className="flex items-center gap-2 mb-6">
                         <span className="text-lg">🕒</span>
@@ -126,7 +133,7 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
                 </div>
             </div>
 
-            {/* 👤 2. Spent by Person */}
+            {/* Spent by Person */}
             <div className="flex flex-wrap gap-4">
                 {Object.entries(trip.spentByPerson || {}).map(([person, amount]) => (
                     <div key={person} className="bg-card border border-card-border px-6 py-4 rounded-2xl flex items-center gap-4 shadow-sm">
@@ -141,7 +148,7 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
                 ))}
             </div>
 
-            {/* 📑 3. Transactions Table */}
+            {/* Transactions Table */}
             <div className="space-y-4">
                 <h3 className="text-2xl font-black text-main-text px-2">Transactions</h3>
                 <div className="bg-card border border-card-border rounded-[2rem] overflow-hidden shadow-sm">
@@ -161,7 +168,7 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
                                     <td className="px-8 py-5 font-bold text-main-text">{exp.description}</td>
                                     <td className="px-8 py-5">
                                         <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-full font-bold">
-                                            {categoryIcons[exp.category]} {exp.category.toLowerCase()}
+                                            {categoryIcons[exp.category as ExpenseCategory]} {exp.category.toLowerCase()}
                                         </span>
                                     </td>
                                     <td className="px-8 py-5">
@@ -185,7 +192,12 @@ export default function ExpensesSection({ trip }: { trip: TripResponseDTO }) {
                 </div>
             </div>
 
-            <AddExpenseModal tripId={trip.id} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => window.location.reload()} />
+            <AddExpenseModal
+                tripId={trip.id}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={onUpdate}
+            />
         </div>
     );
 }

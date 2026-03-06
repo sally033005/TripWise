@@ -2,7 +2,7 @@
 
 import { TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import AddReservationModal from "@/app/trips/[id]/components/AddReservationModal";
 
@@ -15,18 +15,20 @@ const CATEGORY_MAP: Record<string, { icon: string; label: string; color: string;
     OTHERS: { icon: "📄", label: "Others", color: "bg-gray-50", iconColor: "text-gray-600" },
 };
 
-export default function ReservationsSection() {
+export default function ReservationsSection({ trip, onUpdate }: { trip: TripResponseDTO, onUpdate: () => void }) {
     const { id } = useParams();
-    const [trip, setTrip] = useState<TripResponseDTO | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        if (id) {
-            tripService.getTripById(id as string).then(setTrip);
+    const handleDelete = async (resId: number) => {
+        if (confirm("Delete this document?")) {
+            try {
+                await tripService.deleteReservation(resId);
+                onUpdate();
+            } catch (err) { 
+                alert("Failed to delete."); 
+            }
         }
-    }, [id]);
-
-    if (!trip) return <div className="p-10 text-center text-main-text">Loading...</div>;
+    };
 
     return (
         <div className="space-y-6 pb-20">
@@ -46,7 +48,7 @@ export default function ReservationsSection() {
 
             {/* Reservations List */}
             <div className="flex flex-col gap-4">
-                {trip.reservations.length > 0 ? (
+                {trip.reservations && trip.reservations.length > 0 ? (
                     trip.reservations.map(res => {
                         const meta = CATEGORY_MAP[res.category] || CATEGORY_MAP["OTHERS"];
                         return (
@@ -71,26 +73,18 @@ export default function ReservationsSection() {
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    {/* Preview Button */}
                                     <a
                                         href={`http://localhost:8080/api/reservations/download/${res.id}`}
                                         target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-5 py-3 rounded-2xl font-bold text-sm hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                         View File
                                     </a>
 
-                                    {/* Delete Button */}
                                     <button
-                                        onClick={async () => {
-                                            if (confirm("Delete this document?")) {
-                                                try {
-                                                    await tripService.deleteReservation(res.id);
-                                                    window.location.reload();
-                                                } catch (err) { alert("Failed to delete."); }
-                                            }
-                                        }}
+                                        onClick={() => handleDelete(res.id)}
                                         className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
@@ -110,7 +104,7 @@ export default function ReservationsSection() {
                 tripId={id as string}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSuccess={() => window.location.reload()}
+                onSuccess={onUpdate}
             />
         </div>
     );

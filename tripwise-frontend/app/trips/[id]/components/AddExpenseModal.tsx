@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { tripService } from "@/services/api";
 
-export default function AddExpenseModal({ tripId, isOpen, onClose, onSuccess }: any) {
+interface AddExpenseModalProps {
+    tripId: string;
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+}
+
+export default function AddExpenseModal({ tripId, isOpen, onClose, onSuccess }: AddExpenseModalProps) {
     const [formData, setFormData] = useState({
         description: "",
         amount: "",
         category: "FOOD",
-        paidBy: "" 
+        paidBy: ""
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -20,7 +27,7 @@ export default function AddExpenseModal({ tripId, isOpen, onClose, onSuccess }: 
             });
             onSuccess();
             onClose();
-            setFormData({ description: "", amount: "", category: "FOOD", paidBy: "" }); // Reset
+            setFormData({ description: "", amount: "", category: "FOOD", paidBy: "" }); // Reset Form
         } catch (err) {
             alert("Failed to add expense");
         }
@@ -30,7 +37,7 @@ export default function AddExpenseModal({ tripId, isOpen, onClose, onSuccess }: 
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-200">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">Add New Expense 💸</h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
@@ -51,7 +58,7 @@ export default function AddExpenseModal({ tripId, isOpen, onClose, onSuccess }: 
                         <div>
                             <label className="block text-sm font-semibold text-gray-600 mb-1">Amount ($)</label>
                             <input
-                                type="number" required placeholder="0.00"
+                                type="number" required placeholder="0.00" step="0.01"
                                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
                                 value={formData.amount}
                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}

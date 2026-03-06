@@ -2,17 +2,22 @@
 
 import { TripResponseDTO } from "@/types";
 import { tripService } from "@/services/api";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import AddActivityModal from "@/app/trips/[id]/components/AddActivityModal";
-import { useParams } from "next/navigation";
 import EditActivityModal from "@/app/trips/[id]/components/EditActivityModal";
+import { useParams } from "next/navigation";
 
-export default function ItinerarySection() {
+export default function ItinerarySection({ trip, onUpdate }: { trip: TripResponseDTO, onUpdate: () => void }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { id } = useParams();
-    const [trip, setTrip] = useState<TripResponseDTO | null>(null);
     const [editingItem, setEditingItem] = useState<any>(null);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (trip.startDate && !selectedDate) {
+            setSelectedDate(trip.startDate.split('T')[0]);
+        }
+    }, [trip.startDate]);
 
     const formatTime = (dateTimeStr: string) => {
         const date = new Date(dateTimeStr);
@@ -34,24 +39,11 @@ export default function ItinerarySection() {
         if (!confirm("Are you sure you want to delete this activity?")) return;
         try {
             await tripService.deleteItineraryItem(id as string, itemId);
-            window.location.reload();
+            onUpdate(); 
         } catch (err) {
             alert("Failed to delete itinerary item.");
         }
     };
-
-    useEffect(() => {
-        if (id) {
-            tripService.getTripById(id as string).then((data) => {
-                setTrip(data);
-                if (data.startDate) {
-                    setSelectedDate(data.startDate.split('T')[0]);
-                }
-            });
-        }
-    }, [id]);
-
-    if (!trip) return <div className="p-10 text-center text-main-text">Loading Itinerary...</div>;
 
     const allDates = getAllDates(trip.startDate, trip.endDate);
 
@@ -96,7 +88,6 @@ export default function ItinerarySection() {
                                                 <div className="flex gap-4">
                                                     <div className="text-center min-w-[60px]">
                                                         <div className="text-sm font-black text-blue-600 dark:text-blue-400">{formatTime(item.startTime)}</div>
-                                                        {/* Timeline Line */}
                                                         <div className="w-0.5 h-10 bg-blue-100 dark:bg-slate-800 mx-auto my-1"></div>
                                                     </div>
                                                     <div>
@@ -109,7 +100,6 @@ export default function ItinerarySection() {
                                                     </div>
                                                 </div>
 
-                                                {/* Action Buttons */}
                                                 <div className="flex gap-1">
                                                     <button
                                                         onClick={() => setEditingItem(item)}
@@ -129,7 +119,6 @@ export default function ItinerarySection() {
                                     ))}
                                 </div>
                             ) : (
-                                /* ⛱️ Empty State */
                                 <div className="py-20 text-center bg-card border-2 border-dashed border-card-border rounded-3xl">
                                     <p className="text-slate-400 font-medium">No plans for today ⛱️</p>
                                     <button
@@ -144,7 +133,6 @@ export default function ItinerarySection() {
                     )}
                 </div>
 
-                {/* ➕ Floating Action Button */}
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="fixed bottom-10 right-10 bg-blue-600 dark:bg-blue-500 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-3xl hover:scale-110 active:scale-95 transition-all z-50"
@@ -153,20 +141,20 @@ export default function ItinerarySection() {
                 </button>
             </div>
 
-            {/* Modals remain the same */}
             <AddActivityModal
                 tripId={id as string}
                 isOpen={isModalOpen}
                 initialDate={selectedDate}
                 onClose={() => setIsModalOpen(false)}
-                onSuccess={() => window.location.reload()}
+                onSuccess={onUpdate}
             />
+
             <EditActivityModal
                 tripId={id as string}
                 item={editingItem}
                 isOpen={!!editingItem}
                 onClose={() => setEditingItem(null)}
-                onSuccess={() => window.location.reload()}
+                onSuccess={onUpdate}
             />
         </div>
     );

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { tripService } from "@/services/api";
-import { redirect } from "next/dist/server/api-utils";
 
 interface Props {
   tripId: string;
@@ -43,8 +42,8 @@ export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess, i
     e.preventDefault();
     try {
       await tripService.addItineraryItem(tripId, formData);
-      onSuccess(); // Refresh parent component to show new activity
-      onClose();  // Close the modal after successful submission
+      onSuccess(); // 觸發父組件 refreshData
+      onClose();   // 關閉 Modal
     } catch (err) {
       alert("Failed to add activity. Please try again.");
     }
@@ -64,6 +63,7 @@ export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess, i
             <input
               type="text" required placeholder="e.g. Dinner at Shibuya"
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              value={formData.activity}
               onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
             />
           </div>
@@ -81,6 +81,7 @@ export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess, i
             <input
               type="text" placeholder="Search location..."
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl"
+              value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
           </div>

@@ -27,12 +27,19 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
 
     if (!isOpen) return null;
 
+    const resetForm = () => {
+        setFile(null);
+        setCategory("FLIGHT");
+        setDescription("");
+    };
+
     const handleUpload = async () => {
         if (!file) return alert("Please select a file");
         setIsUploading(true);
         try {
             await tripService.uploadReservation(tripId, file, category, description);
             onSuccess();
+            resetForm();
             onClose();
         } catch (err) {
             alert("Upload failed");
@@ -43,14 +50,13 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-card border border-card-border w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl scale-in">
+            <div className="bg-white dark:bg-card border border-card-border w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-2xl font-black text-main-text">Add Reservation</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-main-text">✕</button>
+                    <button onClick={onClose} className="text-slate-400 hover:text-main-text text-xl">✕</button>
                 </div>
 
                 <div className="space-y-6">
-                    {/* Category Selection */}
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">
                             Category
@@ -59,6 +65,7 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                             {CATEGORIES.map((cat) => (
                                 <button
                                     key={cat.value}
+                                    type="button"
                                     onClick={() => setCategory(cat.value)}
                                     className={`flex flex-col items-center p-3 rounded-2xl border transition-all ${category === cat.value
                                         ? "bg-blue-500 border-blue-500 text-white"
@@ -84,7 +91,6 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                         />
                     </div>
 
-                    {/* File Input */}
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">
                             Document File
@@ -97,7 +103,7 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                             />
                             <div className="text-slate-400">
                                 {file ? (
-                                    <p className="text-blue-500 font-bold text-sm">{file.name}</p>
+                                    <p className="text-blue-500 font-bold text-sm truncate px-2">{file.name}</p>
                                 ) : (
                                     <>
                                         <p className="text-2xl mb-1">📁</p>
@@ -111,7 +117,7 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                     <button
                         onClick={handleUpload}
                         disabled={isUploading || !file}
-                        className="w-full bg-slate-900 dark:bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                        className="w-full bg-slate-900 dark:bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                     >
                         {isUploading ? "Uploading..." : "Save Reservation"}
                     </button>
