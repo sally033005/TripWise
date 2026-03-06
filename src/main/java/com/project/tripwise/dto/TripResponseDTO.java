@@ -19,7 +19,7 @@ import com.project.tripwise.model.User;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TripResponseDTO {
-    private Long id;
+    private java.util.UUID id;
     private String title;
     private String destination;
     private LocalDate startDate;

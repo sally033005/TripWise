@@ -12,7 +12,7 @@ public class TripSecurity {
     @Autowired
     private TripRepository tripRepository;
 
-    public boolean isMember(Long tripId) {
+    public boolean isMember(java.util.UUID tripId) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return tripRepository.findById(tripId).map(trip -> {
@@ -25,7 +25,7 @@ public class TripSecurity {
         }).orElse(false);
     }
 
-    public boolean isCreator(Long tripId) {
+    public boolean isCreator(java.util.UUID tripId) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         return tripRepository.findById(tripId)
                 .map(trip -> trip.getCreator().getUsername().equals(currentUsername))

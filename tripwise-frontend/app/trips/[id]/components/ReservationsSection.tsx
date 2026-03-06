@@ -22,7 +22,7 @@ export default function ReservationsSection() {
 
     useEffect(() => {
         if (id) {
-            tripService.getTripById(Number(id)).then(setTrip);
+            tripService.getTripById(id as string).then(setTrip);
         }
     }, [id]);
 
@@ -107,7 +107,7 @@ export default function ReservationsSection() {
             </div>
 
             <AddReservationModal
-                tripId={Number(id)}
+                tripId={id as string}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={() => window.location.reload()}

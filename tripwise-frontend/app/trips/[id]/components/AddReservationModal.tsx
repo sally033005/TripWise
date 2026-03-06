@@ -4,7 +4,7 @@ import { useState } from "react";
 import { tripService } from "@/services/api";
 
 interface Props {
-    tripId: number;
+    tripId: string;
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
@@ -61,8 +61,8 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                                     key={cat.value}
                                     onClick={() => setCategory(cat.value)}
                                     className={`flex flex-col items-center p-3 rounded-2xl border transition-all ${category === cat.value
-                                            ? "bg-blue-500 border-blue-500 text-white"
-                                            : "bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 hover:border-slate-300"
+                                        ? "bg-blue-500 border-blue-500 text-white"
+                                        : "bg-slate-50 dark:bg-slate-800 border-transparent text-slate-500 hover:border-slate-300"
                                         }`}
                                 >
                                     <span className="text-xl mb-1">{cat.icon}</span>

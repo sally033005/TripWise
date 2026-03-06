@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class Trip {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private java.util.UUID id;
 
     @Column(nullable = false)
     private String title;
@@ -44,12 +44,14 @@ public class Trip {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Foreign Key
-    @JsonIgnoreProperties({"trips", "collaboratedTrips", "password"}) // To prevent infinite recursion during JSON serialization
+    @JsonIgnoreProperties({ "trips", "collaboratedTrips", "password" }) // To prevent infinite recursion during JSON
+                                                                        // serialization
     private User creator;
 
     @ManyToMany
     @JoinTable(name = "trip_collaborators", joinColumns = @JoinColumn(name = "trip_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonIgnoreProperties({"trips", "collaboratedTrips", "password"}) // To prevent infinite recursion during JSON serialization
+    @JsonIgnoreProperties({ "trips", "collaboratedTrips", "password" }) // To prevent infinite recursion during JSON
+                                                                        // serialization
     private List<User> collaborators = new ArrayList<>();
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)

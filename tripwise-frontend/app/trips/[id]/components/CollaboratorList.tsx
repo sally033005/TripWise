@@ -5,7 +5,7 @@ import InviteModal from "./InviteModal";
 import { TripResponseDTO } from "@/types";
 
 interface Props {
-    tripId: number;
+    tripId: string;
     creatorName: string;
     collaboratorNames: string[];
     currentUsername?: string;
@@ -23,7 +23,7 @@ export default function CollaboratorList({ tripId, creatorName, collaboratorName
     const [trip, setTrip] = useState<TripResponseDTO | null>(null);
 
     const refreshData = async () => {
-        if (!isNaN(tripId)) {
+        if (tripId) {
             const updatedTrip = await tripService.getTripById(tripId);
             setTrip(updatedTrip);
         }

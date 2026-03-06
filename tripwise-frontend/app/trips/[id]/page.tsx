@@ -12,12 +12,12 @@ type TabType = 'overview' | 'itinerary' | 'expenses' | 'reservations';
 
 export default function TripDetail({ params }: { params: Promise<{ id: string }> }) {
     const unwrappedParams = use(params);
-    const tripId = parseInt(unwrappedParams.id);
+    const tripId = unwrappedParams.id;
     const [trip, setTrip] = useState<TripResponseDTO | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('overview');
 
     useEffect(() => {
-        if (!isNaN(tripId)) {
+        if (tripId) {
             tripService.getTripById(tripId).then(setTrip);
         }
     }, [tripId]);

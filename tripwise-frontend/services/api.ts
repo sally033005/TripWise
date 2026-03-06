@@ -37,7 +37,7 @@ export const tripService = {
     },
 
     // 2. Get details of a specific trip by ID
-    getTripById: async (id: number) => {
+    getTripById: async (id: string) => {
         const response = await api.get<TripResponseDTO>(`/trips/${id}`);
         return response.data;
     },
@@ -48,24 +48,24 @@ export const tripService = {
     },
 
     // 4. Add a new itinerary item to a trip
-    addItineraryItem: async (tripId: number, itemData: any) => {
+    addItineraryItem: async (tripId: string, itemData: any) => {
         const response = await api.post(`/trips/${tripId}/itinerary`, itemData);
         return response.data;
     },
 
     // 5. Delete an itinerary item from a trip
-    deleteItineraryItem: async (tripId: number, itemId: number) => {
+    deleteItineraryItem: async (tripId: string, itemId: number) => {
         await api.delete(`/trips/${tripId}/itinerary/${itemId}`);
     },
 
     // 6. Edit an itinerary item in a trip
-    updateItineraryItem: async (tripId: number, itemId: number, itemData: any) => {
+    updateItineraryItem: async (tripId: string, itemId: number, itemData: any) => {
         const response = await api.put(`/trips/${tripId}/itinerary/${itemId}`, itemData);
         return response.data;
     },
 
     // 7. Add a new expense to a trip
-    addExpense: async (tripId: number, data: any) => {
+    addExpense: async (tripId: string, data: any) => {
         const response = await api.post(`/expenses/trip/${tripId}`, data);
         return response.data;
     },
@@ -76,14 +76,14 @@ export const tripService = {
     },
 
     // 9. Update the total budget of a trip
-    updateTripBudget: async (tripId: number, totalBudget: number) => {
+    updateTripBudget: async (tripId: string, totalBudget: number) => {
         await api.patch(`/trips/${tripId}/budget`, totalBudget, {
             headers: { 'Content-Type': 'application/json' }
         });
     },
 
     // 10. Upload a cover photo for a trip
-    uploadCoverPhoto: async (tripId: number, file: File) => {
+    uploadCoverPhoto: async (tripId: string, file: File) => {
         const formData = new FormData();
         formData.append("file", file);
         const response = await api.post(`/trips/${tripId}/upload-cover`, formData, {
@@ -95,7 +95,7 @@ export const tripService = {
     },
 
     // 11. Upload a reservation file with a category
-    uploadReservation: async (tripId: number, file: File, category: string, description: string) => {
+    uploadReservation: async (tripId: string, file: File, category: string, description: string) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("category", category);
@@ -116,18 +116,18 @@ export const tripService = {
     },
 
     // 13. Delete a trip
-    deleteTrip: async (tripId: number) => {
+    deleteTrip: async (tripId: string) => {
         await api.delete(`/trips/${tripId}`);
     },
 
     // 14. Update an existing trip
-    updateTrip: async (tripId: number, tripData: any) => {
+    updateTrip: async (tripId: string, tripData: any) => {
         const response = await api.put<TripResponseDTO>(`/trips/${tripId}`, tripData);
         return response.data;
     },
 
     // 15. Add a collaborator (Invite)
-    addCollaborator: async (tripId: number, username: string) => {
+    addCollaborator: async (tripId: string, username: string) => {
         const response = await api.post(`/trips/${tripId}/collaborators`, {
             username
         });
@@ -135,7 +135,7 @@ export const tripService = {
     },
 
     // 16. Remove self from collaborators (Leave trip)
-    leaveTrip: async (tripId: number) => {
+    leaveTrip: async (tripId: string) => {
         const response = await api.delete(`/trips/${tripId}/collaborators/self`);
         return response.data;
     },

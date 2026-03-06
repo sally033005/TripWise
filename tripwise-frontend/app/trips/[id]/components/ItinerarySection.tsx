@@ -33,7 +33,7 @@ export default function ItinerarySection() {
     const handleDeleteItem = async (itemId: number) => {
         if (!confirm("Are you sure you want to delete this activity?")) return;
         try {
-            await tripService.deleteItineraryItem(Number(id), itemId);
+            await tripService.deleteItineraryItem(id as string, itemId);
             window.location.reload();
         } catch (err) {
             alert("Failed to delete itinerary item.");
@@ -42,7 +42,7 @@ export default function ItinerarySection() {
 
     useEffect(() => {
         if (id) {
-            tripService.getTripById(Number(id)).then((data) => {
+            tripService.getTripById(id as string).then((data) => {
                 setTrip(data);
                 if (data.startDate) {
                     setSelectedDate(data.startDate.split('T')[0]);
@@ -65,8 +65,8 @@ export default function ItinerarySection() {
                             key={date}
                             onClick={() => setSelectedDate(date)}
                             className={`flex-shrink-0 min-w-[100px] px-4 py-3 rounded-2xl font-bold transition-all border ${selectedDate === date
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg dark:shadow-blue-900/20 scale-105"
-                                    : "bg-card text-slate-400 border-card-border hover:border-slate-300 dark:hover:border-slate-600"
+                                ? "bg-blue-600 text-white border-blue-600 shadow-lg dark:shadow-blue-900/20 scale-105"
+                                : "bg-card text-slate-400 border-card-border hover:border-slate-300 dark:hover:border-slate-600"
                                 }`}
                         >
                             <div className="text-[10px] uppercase opacity-70">Day {index + 1}</div>
@@ -88,7 +88,7 @@ export default function ItinerarySection() {
                                 </span>
                             </div>
 
-                            { (trip.dailyItinerary?.[selectedDate] ?? []).length > 0 ? (
+                            {(trip.dailyItinerary?.[selectedDate] ?? []).length > 0 ? (
                                 <div className="space-y-4">
                                     {trip.dailyItinerary[selectedDate].map((item) => (
                                         <div key={item.id} className="group relative bg-card border border-card-border p-5 rounded-3xl shadow-sm hover:shadow-md hover:border-blue-500/30 transition-all">
@@ -155,14 +155,14 @@ export default function ItinerarySection() {
 
             {/* Modals remain the same */}
             <AddActivityModal
-                tripId={Number(id)}
+                tripId={id as string}
                 isOpen={isModalOpen}
                 initialDate={selectedDate}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={() => window.location.reload()}
             />
             <EditActivityModal
-                tripId={Number(id)}
+                tripId={id as string}
                 item={editingItem}
                 isOpen={!!editingItem}
                 onClose={() => setEditingItem(null)}

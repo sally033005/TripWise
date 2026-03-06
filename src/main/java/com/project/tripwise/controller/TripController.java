@@ -57,7 +57,7 @@ public class TripController {
     // 2. Get a trip by ID
     @GetMapping("/{id}")
     @PreAuthorize("@tripSecurity.isMember(#id)")
-    public ResponseEntity<TripResponseDTO> getTripById(@PathVariable Long id) {
+    public ResponseEntity<TripResponseDTO> getTripById(@PathVariable java.util.UUID id) {
         return tripService.getTripById(id)
                 .map(trip -> ResponseEntity.ok(new TripResponseDTO(trip)))
                 .orElse(ResponseEntity.notFound().build());
@@ -77,7 +77,7 @@ public class TripController {
     // 4. Update an existing trip
     @PutMapping("/{id}")
     @PreAuthorize("@tripSecurity.isMember(#id)")
-    public ResponseEntity<TripResponseDTO> updateTrip(@PathVariable Long id, @RequestBody Trip tripDetails) {
+    public ResponseEntity<TripResponseDTO> updateTrip(@PathVariable java.util.UUID id, @RequestBody Trip tripDetails) {
         return tripRepository.findById(id).map(trip -> {
             trip.setTitle(tripDetails.getTitle());
             trip.setDestination(tripDetails.getDestination());
@@ -94,7 +94,7 @@ public class TripController {
     // 5. Delete a trip
     @DeleteMapping("/{id}")
     @PreAuthorize("@tripSecurity.isCreator(#id)")
-    public ResponseEntity<?> deleteTrip(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTrip(@PathVariable java.util.UUID id) {
         return tripRepository.findById(id).map(trip -> {
             // Delete associated files before deleting the trip record
             if (trip.getReservations() != null) {
@@ -119,7 +119,8 @@ public class TripController {
 
     // 6. Add a collaborator to a trip
     @PostMapping("/{id}/collaborators")
-    public ResponseEntity<?> addCollaborator(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> addCollaborator(@PathVariable java.util.UUID id,
+            @RequestBody Map<String, String> payload) {
         String username = payload.get("username");
         tripService.addCollaborator(id, username);
         return ResponseEntity.ok(Map.of("message", "Collaborator added successfully"));
@@ -128,7 +129,8 @@ public class TripController {
     // 7. Add an itinerary item to a trip
     @PostMapping("/{tripId}/itinerary")
     @PreAuthorize("@tripSecurity.isMember(#tripId)")
-    public ResponseEntity<ItineraryItem> addItineraryItem(@PathVariable Long tripId, @RequestBody ItineraryItem item) {
+    public ResponseEntity<ItineraryItem> addItineraryItem(@PathVariable java.util.UUID tripId,
+            @RequestBody ItineraryItem item) {
         return tripRepository.findById(tripId).map(trip -> {
             item.setTrip(trip); // Set the trip reference in the itinerary item
             return ResponseEntity.ok(itineraryItemRepository.save(item));
@@ -137,7 +139,7 @@ public class TripController {
 
     // 8. Delete an itinerary item from a trip
     @DeleteMapping("/{tripId}/itinerary/{itemId}")
-    public ResponseEntity<?> deleteItineraryItem(@PathVariable Long tripId, @PathVariable Long itemId) {
+    public ResponseEntity<?> deleteItineraryItem(@PathVariable java.util.UUID tripId, @PathVariable Long itemId) {
         return itineraryItemRepository.findById(itemId).map(item -> {
             itineraryItemRepository.delete(item);
             return ResponseEntity.ok().build();
@@ -147,7 +149,7 @@ public class TripController {
     // 9. Edit an itinerary item of a trip
     @PutMapping("/{tripId}/itinerary/{itemId}")
     public ResponseEntity<ItineraryItem> updateItineraryItem(
-            @PathVariable Long tripId,
+            @PathVariable java.util.UUID tripId,
             @PathVariable Long itemId,
             @RequestBody ItineraryItem itemDetails) {
 
@@ -164,7 +166,7 @@ public class TripController {
     @PostMapping("/{tripId}/reservations/upload")
     @PreAuthorize("@tripSecurity.isMember(#tripId)")
     public ResponseEntity<?> uploadReservation(
-            @PathVariable Long tripId,
+            @PathVariable java.util.UUID tripId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("category") String category,
             @RequestParam(value = "description", required = false) String description) {
@@ -190,7 +192,7 @@ public class TripController {
 
     // 11. Update the total budget of a trip
     @PatchMapping("/{id}/budget")
-    public ResponseEntity<?> updateBudget(@PathVariable Long id, @RequestBody Double totalBudget) {
+    public ResponseEntity<?> updateBudget(@PathVariable java.util.UUID id, @RequestBody Double totalBudget) {
         return tripRepository.findById(id).map(trip -> {
             trip.setTotalBudget(totalBudget);
             tripRepository.save(trip);
@@ -200,7 +202,8 @@ public class TripController {
 
     // 12. Upload a cover photo for a trip
     @PostMapping("/{id}/upload-cover")
-    public ResponseEntity<?> uploadCoverPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadCoverPhoto(@PathVariable java.util.UUID id,
+            @RequestParam("file") MultipartFile file) {
         return tripRepository.findById(id).map(trip -> {
             try {
                 String storedFileName = fileService.storeFile(file);
@@ -239,7 +242,7 @@ public class TripController {
     // 14. Remove self from collaborators
     // URL: /api/trips/{tripId}/collaborators/self
     @DeleteMapping("/{tripId}/collaborators/self")
-    public ResponseEntity<String> removeSelf(@PathVariable Long tripId) {
+    public ResponseEntity<String> removeSelf(@PathVariable java.util.UUID tripId) {
         try {
             String message = tripService.removeSelfFromCollaborators(tripId);
             return ResponseEntity.ok(message);

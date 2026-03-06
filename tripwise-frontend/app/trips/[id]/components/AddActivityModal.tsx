@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { tripService } from "@/services/api";
+import { redirect } from "next/dist/server/api-utils";
 
 interface Props {
-  tripId: number;
+  tripId: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -21,20 +22,20 @@ export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess, i
 
   useEffect(() => {
     if (isOpen) {
-        if (initialDate) {
-            const defaultTime = "09:00"; 
-            setFormData(prev => ({
-                ...prev,
-                startTime: `${initialDate}T${defaultTime}`
-            }));
-        } else {
-            const today = new Date().toISOString().slice(0, 16);
-            setFormData(prev => ({ ...prev, startTime: today }));
-        }
+      if (initialDate) {
+        const defaultTime = "09:00";
+        setFormData(prev => ({
+          ...prev,
+          startTime: `${initialDate}T${defaultTime}`
+        }));
+      } else {
+        const today = new Date().toISOString().slice(0, 16);
+        setFormData(prev => ({ ...prev, startTime: today }));
+      }
     } else {
-        setFormData({ activity: "", location: "", startTime: "", notes: "" });
+      setFormData({ activity: "", location: "", startTime: "", notes: "" });
     }
-}, [isOpen, initialDate]);
+  }, [isOpen, initialDate]);
 
   if (!isOpen) return null;
 
@@ -56,34 +57,34 @@ export default function AddActivityModal({ tripId, isOpen, onClose, onSuccess, i
           <h2 className="text-2xl font-bold text-gray-800">New Activity 📝</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">What's the plan?</label>
-            <input 
+            <input
               type="text" required placeholder="e.g. Dinner at Shibuya"
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-              onChange={(e) => setFormData({...formData, activity: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">Date & Time</label>
-            <input 
+            <input
               type="datetime-local" required
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl"
               value={formData.startTime}
-              onChange={(e) => setFormData({...formData, startTime: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-1">Location (Optional)</label>
-            <input 
+            <input
               type="text" placeholder="Search location..."
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl"
-              onChange={(e) => setFormData({...formData, location: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
           </div>
-          
+
           <div className="flex gap-3 mt-8">
             <button type="button" onClick={onClose} className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
             <button type="submit" className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-blue-200 transition-all">Save Activity</button>

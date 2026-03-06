@@ -22,7 +22,7 @@ export interface ReservationDTO {
 }
 
 export interface TripResponseDTO {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   destination: string;

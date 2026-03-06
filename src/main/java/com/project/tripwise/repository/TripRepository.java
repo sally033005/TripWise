@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import com.project.tripwise.model.Trip;
 
 @Repository
-public interface TripRepository extends JpaRepository<Trip, Long> {
+public interface TripRepository extends JpaRepository<Trip, java.util.UUID> {
     List<Trip> findByCreatorId(Long creatorId);
+
     List<Trip> findByCreatorIdOrCollaboratorsId(Long creatorId, Long collaboratorId);
 }

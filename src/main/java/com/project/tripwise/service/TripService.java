@@ -31,7 +31,7 @@ public class TripService {
         return tripRepository.findByCreatorIdOrCollaboratorsId(user.getId(), user.getId());
     }
 
-    public Optional<Trip> getTripById(Long id) {
+    public Optional<Trip> getTripById(java.util.UUID id) {
         return tripRepository.findById(id);
     }
 
@@ -41,7 +41,7 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
-    public String addCollaborator(Long tripId, String username) {
+    public String addCollaborator(java.util.UUID tripId, String username) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
 
@@ -63,7 +63,7 @@ public class TripService {
         return "Successfully added " + username + " to trip " + trip.getTitle();
     }
 
-    public String removeSelfFromCollaborators(Long tripId) {
+    public String removeSelfFromCollaborators(java.util.UUID tripId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
 

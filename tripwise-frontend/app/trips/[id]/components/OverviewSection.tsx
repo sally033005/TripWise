@@ -14,7 +14,7 @@ export default function OverviewSection({ trip }: OverviewProps) {
         const file = e.target.files?.[0];
         if (file && trip.id) {
             try {
-                await tripService.uploadCoverPhoto(Number(trip.id), file);
+                await tripService.uploadCoverPhoto(trip.id, file);
                 window.location.reload();
             } catch (err) {
                 alert("Failed to upload cover photo");

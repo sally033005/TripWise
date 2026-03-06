@@ -22,7 +22,7 @@ public class ExpenseController {
 
     // 1. Add a new expense to a trip
     @PostMapping("/trip/{tripId}")
-    public ResponseEntity<ExpenseDTO> addExpense(@PathVariable Long tripId, @RequestBody ExpenseDTO dto) {
+    public ResponseEntity<ExpenseDTO> addExpense(@PathVariable java.util.UUID tripId, @RequestBody ExpenseDTO dto) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
 
@@ -34,7 +34,7 @@ public class ExpenseController {
         expense.setTrip(trip);
 
         Expense saved = expenseRepository.save(expense);
-        
+
         dto.setId(saved.getId());
         return ResponseEntity.ok(dto);
     }

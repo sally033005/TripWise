@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import api, { tripService } from "@/services/api"; 
+import api, { tripService } from "@/services/api";
 
 interface InviteModalProps {
-  tripId: number;
+  tripId: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (username: string) => void;
@@ -16,23 +16,23 @@ export default function InviteModal({ tripId, isOpen, onClose, onSuccess }: Invi
 
   if (!isOpen) return null;
 
-const handleInvite = async () => {
+  const handleInvite = async () => {
     if (!inviteName.trim()) return;
     setLoading(true);
     setError("");
 
     try {
-        await tripService.addCollaborator(tripId, inviteName);
-        
-        onSuccess(inviteName);
-        onClose();
+      await tripService.addCollaborator(tripId, inviteName);
+
+      onSuccess(inviteName);
+      onClose();
     } catch (err: any) {
-        const serverMessage = err.response?.data; 
-        setError(typeof serverMessage === 'string' ? serverMessage : "Failed to invite user.");
+      const serverMessage = err.response?.data;
+      setError(typeof serverMessage === 'string' ? serverMessage : "Failed to invite user.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -48,7 +48,7 @@ const handleInvite = async () => {
             placeholder="Username (e.g. Micky)"
             className="w-full px-5 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
           />
-          
+
           {error && <p className="text-red-500 text-xs font-bold px-1">{error}</p>}
 
           <div className="flex gap-3 pt-2">
