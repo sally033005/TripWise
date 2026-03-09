@@ -35,12 +35,14 @@ public class TripService {
         return tripRepository.findById(id);
     }
 
+    // 1. Create a new trip
     public Trip createTrip(Trip trip) {
         User user = getCurrentUser();
         trip.setCreator(user);
         return tripRepository.save(trip);
     }
 
+    // 2. Add a collaborator to a trip
     public String addCollaborator(java.util.UUID tripId, String username) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
@@ -63,6 +65,7 @@ public class TripService {
         return "Successfully added " + username + " to trip " + trip.getTitle();
     }
 
+    // 3. Remove self from collaborators
     public String removeSelfFromCollaborators(java.util.UUID tripId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
@@ -83,5 +86,21 @@ public class TripService {
         tripRepository.save(trip);
 
         return "You have successfully left the trip: " + trip.getTitle();
+    }
+
+    // 4. Remove a collaborator (only creator can do this)
+    public void removeCollaborator(java.util.UUID tripId, String collaboratorUsername) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
+    
+        User collaborator = userRepository.findByUsername(collaboratorUsername)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        if (!trip.getCollaborators().contains(collaborator)) {
+            throw new RuntimeException("User is not a collaborator of this trip.");
+        }
+    
+        trip.getCollaborators().remove(collaborator);
+        tripRepository.save(trip);
     }
 }

@@ -139,4 +139,10 @@ export const tripService = {
         const response = await api.delete(`/trips/${tripId}/collaborators/self`);
         return response.data;
     },
+
+    // 17. Remove a specific collaborator (Kick)
+    kickCollaborator: async (tripId: string, username: string) => {
+        const response = await api.delete(`/trips/${tripId}/collaborators/${username}`);
+        return response.data;
+    },
 };

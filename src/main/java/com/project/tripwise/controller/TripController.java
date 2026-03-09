@@ -260,4 +260,18 @@ public class TripController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // 15. Remove a specific collaborator (Only Creator can do this)
+    @DeleteMapping("/{tripId}/collaborators/{username}")
+    @PreAuthorize("@tripSecurity.isCreator(#tripId)")
+    public ResponseEntity<?> kickCollaborator(
+            @PathVariable java.util.UUID tripId,
+            @PathVariable String username) {
+        try {
+            tripService.removeCollaborator(tripId, username);
+            return ResponseEntity.ok(Map.of("message", "Collaborator removed successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
