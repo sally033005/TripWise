@@ -14,7 +14,7 @@ services:
       - tripwise-network
 
   backend:
-    build: .
+    image: ghcr.io/sally033005/tripwise-backend:main
     container_name: tripwise-backend
     ports:
       - "8080:8080"
@@ -33,7 +33,7 @@ services:
       - tripwise-network
 
   frontend:
-    build: ./tripwise-frontend
+    image: ghcr.io/sally033005/tripwise-frontend:main
     container_name: tripwise-frontend
     ports:
       - "3000:3000"
