@@ -54,6 +54,10 @@ export default function OverviewSection({ trip }: OverviewProps) {
         }
     }, []);
 
+    const isCreator = currentUsername === trip.creatorName;
+    const isCollaborator = trip.collaboratorNames?.includes(currentUsername);
+    const isMember = isCreator || isCollaborator;
+
     return (
         <div className="space-y-6 pb-10 transition-colors duration-300">
             {/* 1. Main Banner Card */}
@@ -64,22 +68,24 @@ export default function OverviewSection({ trip }: OverviewProps) {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                <div className="absolute bottom-6 right-6">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        className="hidden"
-                        accept="image/*"
-                    />
-                    <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-3 rounded-full transition-all border border-white/30"
-                        title="Change cover photo"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                    </button>
-                </div>
+                {isMember && (
+                    <div className="absolute bottom-6 right-6">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept="image/*"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-3 rounded-full transition-all border border-white/30"
+                            title="Change cover photo"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        </button>
+                    </div>
+                )}
                 <div className="absolute bottom-8 left-8 text-white">
                     <h1 className="text-4xl font-black mb-2">{trip.title || trip.destination}</h1>
                     <div className="flex items-center gap-4 text-sm font-medium text-white/90">
