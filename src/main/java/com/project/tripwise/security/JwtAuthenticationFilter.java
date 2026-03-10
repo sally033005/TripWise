@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtUtils jwtUtils;
 
@@ -29,21 +33,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        // 1. Extract the token from cookies or Authorization header
+        // 1. Get JWT token from Cookie first
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
-                if ("token".equals(cookie.getName())) { // Look for the "token" cookie
+                if ("token".equals(cookie.getName())) {
                     token = cookie.getValue();
                     try {
                         username = jwtUtils.getUsernameFromToken(token);
                     } catch (Exception e) {
-                        logger.error("JWT Token extract failed: " + e.getMessage());
+                        logger.error("JWT Token extract from cookie failed: {}", e.getMessage());
                     }
                     break; 
                 }
             }
         }
 
+        // 2. If not found in Cookie, try to get it from Authorization header
         if (token == null) {
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -51,12 +56,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 try {
                     username = jwtUtils.getUsernameFromToken(token);
                 } catch (Exception e) {
-                    logger.error("JWT Token extract failed: " + e.getMessage());
+                    logger.error("JWT Token extract from header failed: {}", e.getMessage());
                 }
             }
         }
 
-        // 2. Validate the token 
+        // 3. Validate token and set authentication
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtils.validateToken(token)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
