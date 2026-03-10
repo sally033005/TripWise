@@ -23,8 +23,8 @@ import com.project.tripwise.security.JwtAuthenticationFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired(required = false)
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    // @Autowired(required = false)
+    // private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -41,9 +41,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated());
 
-        if (jwtAuthenticationFilter != null) {
-            http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        }
+        // if (jwtAuthenticationFilter != null) {
+        //     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // }
         return http.build();
     }
 
