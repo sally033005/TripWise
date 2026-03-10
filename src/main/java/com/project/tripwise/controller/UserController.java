@@ -20,15 +20,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    // Register a new user (POST)
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("Username 已經俾人攞咗喇！");
-        }
-        return ResponseEntity.ok(userRepository.save(user));
-    }
-
     // Get all users (GET)
     @GetMapping
     public List<User> getAllUsers() {

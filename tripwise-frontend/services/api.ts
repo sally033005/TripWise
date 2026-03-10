@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { TripResponseDTO, ItineraryItem } from '../types';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === 'production'
+        ? 'https://tripwise-qxu7.onrender.com/api'
+        : 'http://localhost:8080/api');
+
 const api = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: API_BASE_URL,
     withCredentials: true,
 });
 
