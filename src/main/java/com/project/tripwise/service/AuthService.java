@@ -8,7 +8,6 @@ import com.project.tripwise.security.JwtUtils;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Service
@@ -53,30 +52,20 @@ public class AuthService {
         // a. Generate JWT Token
         String token = jwtUtils.generateToken(user.getUsername());
 
-        // b. Create a secure, HttpOnly cookie to store the JWT token
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // Set to true in production with HTTPS, false for local development
-        cookie.setPath("/"); // Cookie is valid for the entire application
-        cookie.setMaxAge(86400);
+        String cookieHeader = String.format(
+                "token=%s; Path=/; Max-Age=86400; HttpOnly; Secure; SameSite=None",
+                token);
 
-        // c. Add the cookie to the response
-        response.addCookie(cookie);
+        response.setHeader("Set-Cookie", cookieHeader);
 
         return user;
     }
 
     // 3. User Logout
     public void logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("token", null);
+        String cookieHeader = "token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None";
 
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // Set to true in production with HTTPS, false for local development
-        cookie.setPath("/");
-
-        cookie.setMaxAge(0);
-
-        response.addCookie(cookie);
+        response.setHeader("Set-Cookie", cookieHeader);
     }
 
 }
