@@ -25,7 +25,10 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Unauthorized - redirect to login page
+            import('js-cookie').then((Cookies) => {
+                Cookies.default.remove('is_logged_in', { path: '/' });
+            });
+            localStorage.removeItem("username");
             window.location.href = "/login";
         }
         return Promise.reject(error);
