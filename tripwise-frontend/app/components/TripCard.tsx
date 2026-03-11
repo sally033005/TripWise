@@ -33,6 +33,9 @@ export default function TripCard({ trip, isPast = false, onRefresh, onEdit }: Tr
 
     const getCoverImageUrl = () => {
         if (trip.coverPhoto) {
+            if (trip.coverPhoto.startsWith('http')) {
+                return trip.coverPhoto;
+            }
             return `${FILE_BASE_URL}${trip.coverPhoto}`;
         }
         const seed = String(trip.id).charCodeAt(0) || 0;

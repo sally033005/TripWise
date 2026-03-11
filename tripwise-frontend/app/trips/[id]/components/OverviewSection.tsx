@@ -27,7 +27,9 @@ export default function OverviewSection({ trip }: OverviewProps) {
     };
 
     const coverImageUrl = trip.coverPhoto
-        ? `${FILE_BASE_URL}${trip.coverPhoto}`
+        ? (trip.coverPhoto.startsWith('http')
+            ? trip.coverPhoto
+            : `${FILE_BASE_URL}${trip.coverPhoto}`)
         : "https://images.unsplash.com/photo-1514894780063-5881f76e84d4?q=80&w=2070";
 
     const calculateDays = () => {
