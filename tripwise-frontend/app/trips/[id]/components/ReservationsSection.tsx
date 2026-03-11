@@ -74,13 +74,10 @@ export default function ReservationsSection({ trip, onUpdate }: { trip: TripResp
 
                                 <div className="flex items-center gap-3">
                                     <a
-                                        href={res.downloadUrl?.startsWith('http')
-                                            ? res.downloadUrl
-                                            : `${FILE_BASE_URL}/api/reservations/download/${res.id}`
-                                        }
+                                        href={res.downloadUrl} 
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="bg-slate-100 dark:bg-slate-800 text-main-text px-4 py-2 rounded-xl font-bold text-xs hover:bg-slate-200 transition-all"
+                                        className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-5 py-3 rounded-2xl font-bold text-sm hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                     >
                                         View File
                                     </a>
