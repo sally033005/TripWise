@@ -39,12 +39,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/users").permitAll()
+                        .requestMatchers("/api/trips/cover/**").permitAll()
+                        .requestMatchers("/api/reservations/download/**").permitAll()
                         .anyRequest().authenticated());
 
         if (jwtAuthenticationFilter != null) {
             http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         }
-        
+
         return http.build();
     }
 

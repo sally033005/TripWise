@@ -99,6 +99,7 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                             <input
                                 type="file"
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                             />
                             <div className="text-slate-400">
@@ -117,9 +118,16 @@ export default function AddReservationModal({ tripId, isOpen, onClose, onSuccess
                     <button
                         onClick={handleUpload}
                         disabled={isUploading || !file}
-                        className="w-full bg-slate-900 dark:bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                        className="w-full bg-slate-900 dark:bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                     >
-                        {isUploading ? "Uploading..." : "Save Reservation"}
+                        {isUploading ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span>Uploading to Cloud...</span>
+                            </>
+                        ) : (
+                            "Save Reservation"
+                        )}
                     </button>
                 </div>
             </div>

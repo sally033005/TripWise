@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { TripResponseDTO } from "@/types";
-import { tripService } from "@/services/api";
+import { tripService, FILE_BASE_URL } from "@/services/api";
 import { useEffect, useState } from "react";
 
 interface TripCardProps {
@@ -13,29 +13,27 @@ interface TripCardProps {
 }
 
 const DEFAULT_IMAGES = [
-    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070", 
+    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073",
     "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?q=80&w=2070",
-    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073", 
+    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073",
     "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070",
 ];
 
 export default function TripCard({ trip, isPast = false, onRefresh, onEdit }: TripCardProps) {
     const [currentUsername, setCurrentUsername] = useState<string | null>(null);
 
-    // 1. 初始化時拎返當前 User
     useEffect(() => {
         const storedUser = localStorage.getItem("username");
         setCurrentUsername(storedUser);
     }, []);
 
-    // 2. 權限判斷
     const isOwner = currentUsername?.toLowerCase() === trip.creatorName?.toLowerCase();
     const isMember = isOwner || trip.collaboratorNames?.some(name => name.toLowerCase() === currentUsername?.toLowerCase());
 
     const getCoverImageUrl = () => {
         if (trip.coverPhoto) {
-            return `http://localhost:8080${trip.coverPhoto}`;
+            return `${FILE_BASE_URL}${trip.coverPhoto}`;
         }
         const seed = String(trip.id).charCodeAt(0) || 0;
         const index = seed % DEFAULT_IMAGES.length;
@@ -111,7 +109,7 @@ export default function TripCard({ trip, isPast = false, onRefresh, onEdit }: Tr
                             {trip.title}
                         </h3>
                     </div>
-                    
+
                     <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 font-medium line-clamp-2 italic min-h-[40px]">
                         {trip.description ? `"${trip.description}"` : "No description provided."}
                     </p>
@@ -126,7 +124,7 @@ export default function TripCard({ trip, isPast = false, onRefresh, onEdit }: Tr
                                 <span className="mr-3 text-lg opacity-70">📅</span>
                                 {trip.startDate} — {trip.endDate}
                             </div>
-                            
+
                             <span className="text-[9px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold uppercase tracking-wider">
                                 By {trip.creatorName}
                             </span>

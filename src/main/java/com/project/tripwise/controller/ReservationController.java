@@ -36,42 +36,39 @@ public class ReservationController {
     }
 
     // 2. Download or preview a reservation file
-    @GetMapping("/download/{reservationId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+    @GetMapping("/download/{fileName:.+}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
+        Reservation reservation = reservationRepository.findByFilePath(fileName)
+                .orElseThrow(() -> new RuntimeException("File record not found in database"));
 
         try {
-            Path filePath = Paths.get("./uploads").toAbsolutePath().resolve(reservation.getFilePath()).normalize();
+            Path filePath = Paths.get("./uploads").toAbsolutePath().resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists()) {
                 String contentType = reservation.getFileType();
                 if (contentType == null) {
-                    try {
-                        contentType = Files.probeContentType(filePath);
-                    } catch (IOException e) {
-                        contentType = "application/octet-stream";
-                    }
+                    contentType = Files.probeContentType(filePath);
                 }
+                if (contentType == null)
+                    contentType = "application/octet-stream";
 
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
                         .header(HttpHeaders.CONTENT_DISPOSITION,
                                 "inline; filename=\"" + reservation.getFileName() + "\"")
-                        .header(HttpHeaders.CACHE_CONTROL, "no-cache")
                         .body(resource);
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (MalformedURLException ex) {
+        } catch (Exception ex) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
     // 3. Delete a reservation file
     @DeleteMapping("/{reservationId}")
-    public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId) { 
+    public ResponseEntity<?> deleteReservation(@PathVariable Long reservationId) {
         return reservationRepository.findById(reservationId).map(reservation -> {
             // A. Find the reservation record in the database using the reservationId
             String fileNameInFolder = reservation.getFilePath();

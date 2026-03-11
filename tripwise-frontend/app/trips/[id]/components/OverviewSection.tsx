@@ -1,5 +1,5 @@
 import { TripResponseDTO } from "@/types";
-import { tripService } from "@/services/api";
+import { tripService, FILE_BASE_URL } from "@/services/api";
 import { useRef, useState, useEffect } from "react";
 import CollaboratorList from "./CollaboratorList";
 
@@ -9,21 +9,25 @@ interface OverviewProps {
 
 export default function OverviewSection({ trip }: OverviewProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file && trip.id) {
             try {
+                setIsUploading(true);
                 await tripService.uploadCoverPhoto(trip.id, file);
                 window.location.reload();
             } catch (err) {
                 alert("Failed to upload cover photo");
+            } finally {
+                setIsUploading(false);
             }
         }
     };
 
     const coverImageUrl = trip.coverPhoto
-        ? `http://localhost:8080${trip.coverPhoto}`
+        ? `${FILE_BASE_URL}${trip.coverPhoto}`
         : "https://images.unsplash.com/photo-1514894780063-5881f76e84d4?q=80&w=2070";
 
     const calculateDays = () => {
@@ -79,10 +83,15 @@ export default function OverviewSection({ trip }: OverviewProps) {
                         />
                         <button
                             onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
                             className="bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-3 rounded-full transition-all border border-white/30"
                             title="Change cover photo"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            {isUploading ? (
+                                <span className="animate-spin">🌀</span>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            )}
                         </button>
                     </div>
                 )}
