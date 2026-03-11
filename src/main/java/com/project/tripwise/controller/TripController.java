@@ -179,20 +179,22 @@ public class TripController {
             @RequestParam(value = "description", required = false) String description) {
         return tripRepository.findById(tripId).map(trip -> {
             try {
-                String storedFileName = fileService.storeFile(file);
+                String cloudUrl = fileService.storeFile(file);
 
                 Reservation res = new Reservation();
                 res.setFileName(file.getOriginalFilename());
-                res.setFilePath(storedFileName);
-                res.setDownloadUrl("/api/reservations/download/" + storedFileName);
+
+                res.setFilePath(cloudUrl);
+                res.setDownloadUrl(cloudUrl);
+
                 res.setCategory(category);
                 res.setDescription(description);
                 res.setTrip(trip);
 
                 reservationRepository.save(res);
-                return ResponseEntity.ok("Uploaded");
+                return ResponseEntity.ok("Uploaded successfully");
             } catch (Exception e) {
-                return ResponseEntity.internalServerError().build();
+                return ResponseEntity.internalServerError().body("Upload failed: " + e.getMessage());
             }
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -217,7 +219,7 @@ public class TripController {
             try {
                 String cloudUrl = fileService.storeFile(file);
                 trip.setCoverPhoto(cloudUrl);
-                
+
                 // String storedFileName = fileService.storeFile(file);
                 // trip.setCoverPhoto("/api/trips/cover/" + storedFileName);
                 tripRepository.save(trip);
