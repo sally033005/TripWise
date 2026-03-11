@@ -37,6 +37,8 @@ api.interceptors.response.use(
 
 export default api;
 
+export const FILE_BASE_URL = API_BASE_URL.replace('/api', '');
+
 export const tripService = {
     // 1. Get all trips for the user
     getAllTrips: async () => {

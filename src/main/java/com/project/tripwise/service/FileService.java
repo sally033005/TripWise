@@ -2,16 +2,41 @@ package com.project.tripwise.service;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.UUID;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class FileService {
 
     private final Path fileStorageLocation;
+
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
+
+    @Value("${cloudinary.api_key}")
+    private String apiKey;
+
+    @Value("${cloudinary.api_secret}")
+    private String apiSecret;
+
+    private Cloudinary cloudinary;
+
+    @PostConstruct
+    public void init() {
+        this.cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", cloudName,
+                "api_key", apiKey,
+                "api_secret", apiSecret,
+                "secure", true));
+    }
 
     // Initialize the file storage location from application properties
     public FileService(@Value("${file.upload-dir}") String uploadDir) {
@@ -24,26 +49,40 @@ public class FileService {
     }
 
     // Store the file and return the stored file name/path
-    public String storeFile(MultipartFile file) {
-        // Generate a unique file name to prevent overwriting existing files
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+    public String storeFile(MultipartFile file) throws IOException {
+        Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                ObjectUtils.asMap("resource_type", "auto"));
 
-        try {
-            Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException ex) {
-            throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
+        Object secureUrl = uploadResult.get("secure_url");
+        if (secureUrl == null) {
+            throw new IOException("Failed to get secure_url from Cloudinary response");
         }
+        return secureUrl.toString();
     }
 
     // Delete a file by its name
-    public void deleteFile(String fileName) {
-        try {
-            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-            Files.deleteIfExists(filePath);
-        } catch (IOException ex) {
-            throw new RuntimeException("Could not delete file " + fileName + ". Please try again!", ex);
+    public void deleteFile(String fileIdentifier) {
+        if (fileIdentifier == null || fileIdentifier.isEmpty())
+            return;
+
+        if (fileIdentifier.startsWith("http")) {
+            try {
+                String[] parts = fileIdentifier.split("/");
+                String lastPart = parts[parts.length - 1];
+                String publicId = lastPart.substring(0, lastPart.lastIndexOf("."));
+
+                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                System.out.println("Successfully deleted from Cloudinary: " + publicId);
+            } catch (Exception e) {
+                System.err.println("Cloudinary delete failed: " + e.getMessage());
+            }
+        } else {
+            try {
+                Path filePath = this.fileStorageLocation.resolve(fileIdentifier).normalize();
+                Files.deleteIfExists(filePath);
+            } catch (IOException ex) {
+                System.err.println("Local delete failed: " + ex.getMessage());
+            }
         }
     }
 }

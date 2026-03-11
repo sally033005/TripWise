@@ -215,9 +215,11 @@ public class TripController {
             @RequestParam("file") MultipartFile file) {
         return tripRepository.findById(id).map(trip -> {
             try {
-                String storedFileName = fileService.storeFile(file);
-
-                trip.setCoverPhoto("/api/trips/cover/" + storedFileName);
+                String cloudUrl = fileService.storeFile(file);
+                trip.setCoverPhoto(cloudUrl);
+                
+                // String storedFileName = fileService.storeFile(file);
+                // trip.setCoverPhoto("/api/trips/cover/" + storedFileName);
                 tripRepository.save(trip);
 
                 return ResponseEntity.ok().body(Map.of("coverUrl", trip.getCoverPhoto()));
