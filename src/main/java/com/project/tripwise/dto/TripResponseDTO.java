@@ -82,8 +82,13 @@ public class TripResponseDTO {
                         rDto.setFileName(res.getFileName());
                         rDto.setCategory(res.getCategory());
                         rDto.setDescription(res.getDescription());
-                        // Set the download URL for each reservation file
-                        rDto.setDownloadUrl("/api/trips/" + trip.getId() + "/reservations/download/" + res.getId());
+
+                        String storedUrl = res.getDownloadUrl();
+                        if (storedUrl != null && storedUrl.startsWith("http")) {
+                            rDto.setDownloadUrl(storedUrl);
+                        } else {
+                            rDto.setDownloadUrl("/api/reservations/download/" + res.getFilePath());
+                        }
                         return rDto;
                     })
                     .collect(Collectors.toList());
