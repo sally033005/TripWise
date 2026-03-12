@@ -33,11 +33,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            User user = authService.login(request, response);
+            String token = authService.login(request);
             return ResponseEntity.ok(Map.of(
-                    "username", user.getUsername(),
+                    "username", request.getUsername(),
+                    "token", token,
                     "message", "Login successful"));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Login failed: " + e.getMessage());

@@ -11,11 +11,11 @@ export const authService = {
     // Login
     login: async (credentials: any) => {
         const response = await api.post("/auth/login", credentials);
-        if (response.data && response.data.username) {
+        if (response.data && response.data.token) {
+            localStorage.setItem("token", response.data.token);
             localStorage.setItem("username", response.data.username);
-            // Set a cookie to indicate the user is logged in (expires in 1 day)
-            Cookies.set('is_logged_in', 'true', { expires: 1, path: '/' });
 
+            Cookies.set('is_logged_in', 'true', { expires: 1, path: '/' });
             window.dispatchEvent(new Event("storage"));
         }
         return response.data;
