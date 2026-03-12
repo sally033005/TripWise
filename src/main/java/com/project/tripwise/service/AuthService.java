@@ -41,7 +41,7 @@ public class AuthService {
     }
 
     // 2. User Login
-    public User login(LoginRequest request, HttpServletResponse response) {
+    public String login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -49,16 +49,7 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        // a. Generate JWT Token
-        String token = jwtUtils.generateToken(user.getUsername());
-
-        String cookieHeader = String.format(
-                "token=%s; Path=/; Max-Age=86400; HttpOnly; Secure; SameSite=None",
-                token);
-
-        response.setHeader("Set-Cookie", cookieHeader);
-
-        return user;
+        return jwtUtils.generateToken(user.getUsername());
     }
 
     // 3. User Logout
