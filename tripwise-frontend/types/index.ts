@@ -16,6 +16,7 @@ export interface ItineraryItem {
 export interface ReservationDTO {
   id: number;
   fileName: string;
+  filePath: string;
   downloadUrl: string;
   category: string;
   description?: string;
