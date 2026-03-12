@@ -51,7 +51,10 @@ public class FileService {
     // Store the file and return the stored file name/path
     public String storeFile(MultipartFile file) throws IOException {
         Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("resource_type", "auto"));
+                ObjectUtils.asMap(
+                        "resource_type", "auto",
+                        "access_mode", "public",
+                        "type", "upload"));
 
         Object secureUrl = uploadResult.get("secure_url");
         if (secureUrl == null) {
