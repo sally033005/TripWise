@@ -23,13 +23,9 @@ export const authService = {
 
     // Logout
     logout: async () => {
-        try {
-            await api.post("/auth/logout");
-        } finally {
-            // Clear client-side auth state regardless of server response
-            Cookies.remove('is_logged_in', { path: '/' });
-            localStorage.removeItem("username");
-            window.location.href = "/login";
-        }
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        Cookies.remove('is_logged_in');
+        window.location.href = "/login";
     }
 };

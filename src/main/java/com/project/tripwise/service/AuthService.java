@@ -54,9 +54,8 @@ public class AuthService {
 
     // 3. User Logout
     public void logout(HttpServletResponse response) {
-        String cookieHeader = "token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None";
-
-        response.setHeader("Set-Cookie", cookieHeader);
+        // String cookieHeader = "token=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None";
+        // response.setHeader("Set-Cookie", cookieHeader);
     }
 
 }
